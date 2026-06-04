@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import { getStats, listLearnedSongs, getPlan, ADMIN_EMAILS } from "@/lib/storage";
+import { getStats, listLearnedSongs, getPlan, getMyReferralCode, ADMIN_EMAILS } from "@/lib/storage";
 import { getUser, signOut, supabaseEnabled } from "@/lib/supabase";
 import { toggleSound, soundEnabled } from "@/lib/feedback";
 
@@ -18,11 +18,13 @@ export default function ProfilePage() {
   const [theme, setTheme] = useState("light");
   const [plan, setPlan] = useState(null);
   const [showLearned, setShowLearned] = useState(false);
+  const [refCode, setRefCode] = useState(null);
 
   useEffect(() => {
     getStats().then(setStats);
     listLearnedSongs().then(setLearned);
     getPlan().then(setPlan);
+    getMyReferralCode().then(setRefCode);
     getUser().then(setUser);
     setSound(soundEnabled());
     try {
@@ -236,7 +238,9 @@ export default function ProfilePage() {
           const data = {
             title: "Запевай",
             text: "Я учу песни наизусть в «Запевай» — присоединяйся!",
-            url: "https://zapevai.vercel.app",
+            url:
+              "https://zapevai.vercel.app" +
+              (refCode ? `/?ref=${refCode}` : ""),
           };
           try {
             if (navigator.share) await navigator.share(data);
@@ -251,8 +255,18 @@ export default function ProfilePage() {
         🎤 Позвать друзей
       </button>
 
+      {refCode && (
+        <p className="mt-2 text-center text-xs text-sub">
+          Твоя ссылка: zapevai.vercel.app/?ref={refCode} — за приглашённых
+          будут бонусы
+        </p>
+      )}
+
       <p className="mt-8 text-center text-xs text-sub">
-        Запевай · учи песни с удовольствием
+        Запевай · учи песни с удовольствием ·{" "}
+        <Link href="/terms" className="underline">
+          условия
+        </Link>
       </p>
     </main>
   );

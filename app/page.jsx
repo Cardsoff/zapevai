@@ -13,6 +13,7 @@ import {
   migrateGuestData,
   searchSongs,
   addToLibrary,
+  applyPendingReferral,
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
 import WaveLine, { roman } from "@/components/Decor";
@@ -34,12 +35,18 @@ export default function HomePage() {
   async function loadAll() {
     setLoadError(false);
     try {
+      // реф-код из ссылки: запоминаем до регистрации
+      try {
+        const ref = new URLSearchParams(window.location.search).get("ref");
+        if (ref) localStorage.setItem("zp_ref", ref);
+      } catch {}
       // если гость только что вошёл — перенести его данные в облако
       const u0 = await getUser();
       if (u0) {
         try {
           await migrateGuestData();
         } catch {}
+        applyPendingReferral();
       }
       const [s, d, st, u] = await Promise.all([
         listMySongs(),

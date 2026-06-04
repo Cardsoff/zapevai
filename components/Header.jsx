@@ -9,7 +9,13 @@ export default function Header({ title, back = true, right = null }) {
       <div className="flex items-center gap-3">
         {back && (
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              if (typeof window !== "undefined" && window.history.length > 1) {
+                router.back();
+              } else {
+                router.push("/");
+              }
+            }}
             aria-label="Назад"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-card text-lg active:scale-90 transition-transform"
           >

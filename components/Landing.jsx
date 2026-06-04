@@ -123,6 +123,13 @@ export default function Landing({ onTry }) {
           </div>
         ))}
       </motion.div>
+
+      <p className="mt-4 text-center text-[11px] text-sub">
+        Тексты добавляют пользователи для личного обучения ·{" "}
+        <Link href="/terms" className="underline">
+          условия
+        </Link>
+      </p>
     </main>
   );
 }

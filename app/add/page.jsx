@@ -205,6 +205,14 @@ export default function AddSongPage() {
         )}
       </AnimatePresence>
 
+      <p className="mt-3 px-1 text-center text-[11px] leading-snug text-sub">
+        Добавляя текст, ты подтверждаешь, что используешь его для личного
+        обучения и имеешь на это право.{" "}
+        <a href="/terms" className="underline">
+          Условия
+        </a>
+      </p>
+
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={() => submit(false)}

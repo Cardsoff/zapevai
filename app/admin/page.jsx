@@ -337,7 +337,8 @@ export default function AdminPage() {
               {expanded === u.user_id && (
                 <div className="mt-3 border-t border-line pt-3">
                   <p className="mb-1 text-xs text-sub">
-                    Последний вход: {fmtDate(u.last_sign_in_at)}
+                    Последний вход: {fmtDate(u.last_sign_in_at)} · пригласил:{" "}
+                    {u.invited_count ?? 0}
                   </p>
                   <p className="mb-2 kicker !text-[10px]">Песни в библиотеке</p>
                   {userSongs[u.user_id] === undefined ? (
