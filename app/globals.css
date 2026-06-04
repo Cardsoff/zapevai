@@ -4,7 +4,7 @@
 
 :root {
   --ink: #2a2118;
-  --sub: #8a7d6a;
+  --sub: #6b5e4b;
   --bg: #f6f1e7;
   --card: rgba(255, 253, 248, 0.9);
   --line: rgba(42, 33, 24, 0.12);
@@ -19,7 +19,7 @@
 /* ---- Темы: тёмная (тёплая бумага ночью) и чёрная (AMOLED) ---- */
 [data-theme="dark"] {
   --ink: #ece4d4;
-  --sub: #a3957f;
+  --sub: #bcae97;
   --bg: #1c1713;
   --card: rgba(42, 35, 27, 0.92);
   --line: rgba(236, 228, 212, 0.13);
@@ -32,7 +32,7 @@
 }
 [data-theme="black"] {
   --ink: #e8e2d6;
-  --sub: #94897a;
+  --sub: #a89c89;
   --bg: #0a0908;
   --card: rgba(24, 21, 17, 0.96);
   --line: rgba(232, 226, 214, 0.1);
@@ -123,10 +123,14 @@ body {
 /* ---- Бумажные карточки ---- */
 .glass {
   background: var(--card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--line);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+@supports (backdrop-filter: blur(12px)) {
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
 }
 
 .text-gradient {
@@ -202,9 +206,12 @@ body {
   background: var(--line);
 }
 
-input,
-textarea {
-  outline: none;
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--wine);
+  outline-offset: 2px;
 }
 
 ::placeholder {
@@ -215,4 +222,21 @@ textarea {
 /* safe area для iPhone */
 .pb-safe {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
+}
+
+
+/* ---- Доступность: уважаем «уменьшить движение» ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .aurora::before,
+  .aurora::after,
+  .aurora .third {
+    animation: none;
+  }
 }

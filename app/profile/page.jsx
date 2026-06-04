@@ -363,7 +363,7 @@ export default function ProfilePage() {
           <p className="mb-4 text-sm text-sub">
             Всё хранится в этом браузере.{" "}
             {supabaseEnabled()
-              ? "Войди, чтобы не потерять прогресс."
+              ? "Войди — и репертуар с прогрессом останется навсегда."
               : "Облако появится после подключения Supabase."}
           </p>
           {supabaseEnabled() && (

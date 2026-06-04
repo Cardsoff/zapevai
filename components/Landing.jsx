@@ -30,9 +30,9 @@ export default function Landing({ onTry }) {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6 text-center"
       >
-        <h2 className="font-serif text-4xl font-bold tracking-tight">
+        <p className="font-serif text-4xl font-bold tracking-tight" aria-label="Запевай">
           Запе<span className="italic text-accent">вай</span>
-        </h2>
+        </p>
       </motion.div>
 
       {/* Оффер */}
@@ -59,13 +59,23 @@ export default function Landing({ onTry }) {
             ) : (
               <span
                 key={i}
+                role="button"
+                tabIndex={0}
+                aria-label="Скрытое слово — коснись, чтобы открыть"
                 onClick={() => {
                   tapFeedback();
                   setOpen((o) => ({ ...o, [i]: true }));
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    tapFeedback();
+                    setOpen((o) => ({ ...o, [i]: true }));
+                  }
+                }}
                 className="blank blank-lg px-1"
               >
-                {w.t}{" "}
+                <span aria-hidden="true">{w.t}</span>{" "}
               </span>
             )
           )}

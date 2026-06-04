@@ -43,7 +43,7 @@ export default function AuthPage() {
         <Header title="Вход" />
         <div className="glass rounded-xl3 p-6 text-center">
           <p className="mb-2 font-serif text-3xl italic text-accent">♪</p>
-          <p className="font-serif text-lg font-bold">Облако ещё не подключено</p>
+          <p className="font-serif text-lg font-bold">Вход пока недоступен</p>
           <p className="mt-2 text-sm text-sub">
             Пока работает гостевой режим: песни и прогресс хранятся в этом
             браузере.

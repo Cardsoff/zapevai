@@ -405,7 +405,7 @@ export default function SongScreen({ id }) {
           (learned ? "bg-good/15 text-good" : "glass")
         }
       >
-        {learned ? "🏆 В выучено ✓" : "Добавить в выучено"}
+        {learned ? "🏆 Выучено наизусть" : "Отметить как выученную"}
       </button>
 
       {/* Замечание к песне */}
@@ -420,7 +420,7 @@ export default function SongScreen({ id }) {
       {reporting && (
         <div className="glass mt-3 rounded-xl2 p-4">
           <p className="mb-2 text-sm font-semibold">
-            Что не так с песней? Замечание уйдёт редакции.
+            Что не так с песней? Напиши — мы разберёмся.
           </p>
           <textarea
             value={reportText}
@@ -489,7 +489,7 @@ export default function SongScreen({ id }) {
           onClick={() => setConfirmDelete(true)}
           className="mt-3 w-full py-2 text-sm text-sub"
         >
-          Убрать из библиотеки
+          Убрать из репертуара
         </button>
       )}
 
@@ -508,7 +508,7 @@ export default function SongScreen({ id }) {
                 onClick={start}
                 className="btn-gradient w-full rounded-2xl py-3.5 text-base font-semibold active:scale-95 transition-transform"
               >
-                Начать · {startLabel}
+                Начать — {startLabel}
               </button>
             </div>
           </motion.div>

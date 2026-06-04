@@ -1,7 +1,12 @@
 import Header from "@/components/Header";
 import Link from "next/link";
 
-export const metadata = { title: "Условия использования — Запевай" };
+export const metadata = {
+  title: "Условия использования",
+  description:
+    "Правила использования тренажёра «Запевай»: авторские права, хранение данных и пользовательский контент.",
+  alternates: { canonical: "https://zapevai.vercel.app/terms" },
+};
 
 export default function TermsPage() {
   return (
@@ -29,8 +34,8 @@ export default function TermsPage() {
         <h2 className="mb-1 text-lg font-bold">3. Права авторов</h2>
         <p className="mb-4 text-sub">
           Права на тексты песен принадлежат их авторам и правообладателям.
-          Если вы правообладатель и считаете, что какой-то текст размещён
-          неправомерно, напишите нам через кнопку «Замечание к песне» или на
+          Если ты правообладатель и считаешь, что какой-то текст размещён
+          неправомерно, напиши нам через кнопку «Замечание к песне» или на
           почту human.artem26@gmail.com — мы оперативно удалим материал.
         </p>
 

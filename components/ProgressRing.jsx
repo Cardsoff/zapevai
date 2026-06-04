@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { motion } from "framer-motion";
 
 export default function ProgressRing({
@@ -8,6 +9,7 @@ export default function ProgressRing({
   stroke = 5,
   label,
 }) {
+  const gradId = useId();
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c - (Math.min(value, 100) / 100) * c;
@@ -24,7 +26,7 @@ export default function ProgressRing({
           strokeWidth={stroke}
         />
         <defs>
-          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="var(--wine)" />
             <stop offset="100%" stopColor="var(--gold)" />
           </linearGradient>
@@ -34,7 +36,7 @@ export default function ProgressRing({
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="url(#ringGrad)"
+          stroke={`url(#${gradId})`}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={c}

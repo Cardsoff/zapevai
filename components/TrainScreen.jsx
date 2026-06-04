@@ -20,23 +20,40 @@ export default function TrainScreen({ id, mode, level }) {
   const [song, setSong] = useState(null);
   const [score, setScore] = useState(null);
   const [round, setRound] = useState(0); // для «Ещё раз»
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    getSong(id).then(setSong);
+    getSong(id)
+      .then((s) => {
+        setSong(s);
+        if (!s) setFailed(true);
+      })
+      .catch(() => setFailed(true));
   }, [id]);
 
   async function finish(s) {
     setScore(s);
-    await saveResult(id, mode, level, s);
+    try {
+      await saveResult(id, mode, level, s);
+    } catch {}
   }
 
   if (song === null) {
     return (
       <main>
         <Header title="Тренировка" />
-        <div className="glass animate-pulse rounded-xl3 p-10 text-center text-sub">
-          Загрузка…
-        </div>
+        {failed ? (
+          <div className="glass rounded-xl3 p-8 text-center">
+            <p className="mb-2 font-serif text-lg font-bold">
+              Песня не загрузилась
+            </p>
+            <p className="text-sm text-sub">Нет связи или песня была убрана</p>
+          </div>
+        ) : (
+          <div className="glass animate-pulse rounded-xl3 p-10 text-center text-sub">
+            Загрузка…
+          </div>
+        )}
       </main>
     );
   }

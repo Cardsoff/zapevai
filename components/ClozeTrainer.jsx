@@ -80,10 +80,19 @@ export default function ClozeTrainer({ songId, lyrics, level, onFinish }) {
                     return (
                       <span
                         key={ti}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Скрытое слово — открой, если забыл"
                         className="blank"
                         onClick={() => tapWord(t)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            tapWord(t);
+                          }
+                        }}
                       >
-                        {t.text}
+                        <span aria-hidden="true">{t.text}</span>
                       </span>
                     );
                   }
@@ -113,11 +122,11 @@ export default function ClozeTrainer({ songId, lyrics, level, onFinish }) {
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-lg px-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
         <div className="glass rounded-xl3 p-4 shadow-2xl shadow-black/10">
           <p className="mb-3 text-center font-serif text-sm italic text-sub">
-            Открыто:{" "}
+            Забыл:{" "}
             <span className="font-bold not-italic text-ink tabular-nums">
               {opened} из {total}
             </span>{" "}
-            скрытых
+            слов
           </p>
           <button
             onClick={finish}

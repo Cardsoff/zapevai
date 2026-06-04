@@ -149,7 +149,7 @@ export default function AddSongPage() {
           className="glass w-full resize-none rounded-xl2 px-4 py-3.5 font-serif text-[16px] leading-relaxed"
         />
         <p className="px-1 text-right text-xs text-sub">
-          {words > 0 ? `${words} слов` : "минимум 10 слов"}
+          {words > 0 ? `${words} слов` : "нужно хотя бы 10 слов"}
         </p>
       </div>
 

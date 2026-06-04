@@ -167,14 +167,14 @@ export default function HomePage() {
           <button
             onClick={cycleTheme}
             aria-label="Сменить тему"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-card text-sm"
           >
             {theme === "light" ? "☀" : theme === "dark" ? "☾" : "●"}
           </button>
           <Link
             href="/profile"
             aria-label="Профиль"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-card text-sm"
           >
             {user ? "✓" : "○"}
           </Link>
@@ -208,7 +208,7 @@ export default function HomePage() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-semibold">
-            {stats.streak > 0 ? "дней подряд вы поёте" : "начни серию сегодня"}
+            {stats.streak > 0 ? "дней подряд ты поёшь" : "начни серию сегодня"}
           </p>
           {stats.best > 1 && (
             <p className="mt-0.5 text-xs text-sub">
@@ -247,7 +247,7 @@ export default function HomePage() {
           </span>
           <p className="kicker mb-2 !text-accent2">Пора повторить</p>
           <p className="font-serif text-xl font-bold leading-snug">
-            «{firstDue.title}» <span className="italic font-medium">ждёт вас</span>
+            «{firstDue.title}» <span className="italic font-medium">ждёт тебя</span>
           </p>
           <p className="mt-1 text-[13px] opacity-80">
             Память начинает таять — повтори, пока слова тёплые.
@@ -294,7 +294,7 @@ export default function HomePage() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={user ? "Поиск по моим и общей базе" : "Поиск по репертуару"}
+          placeholder={user ? "Поиск по репертуару и общей базе" : "Поиск по репертуару"}
           className="glass mb-4 w-full rounded-xl2 px-4 py-3 text-[16px]"
         />
       )}
@@ -328,7 +328,7 @@ export default function HomePage() {
                     onClick={() => addFromBase(s.id)}
                     className="shrink-0 rounded-xl border border-accent bg-accentDeep px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
                   >
-                    + себе
+                    Добавить себе
                   </button>
                 </div>
               ))}
@@ -349,7 +349,7 @@ export default function HomePage() {
         >
           <p className="mb-2 font-serif text-3xl italic text-accent">♪</p>
           <p className="mb-1 font-serif text-xl font-bold">
-            {query ? "Ничего не найдено" : "Первая страница пуста"}
+            {query ? "Ничего не найдено" : "Репертуар пока пуст"}
           </p>
           {!query && (
             <p className="text-sm text-sub">
@@ -422,7 +422,7 @@ export default function HomePage() {
                     onClick={() => addFromBase(s.id)}
                     className="shrink-0 rounded-xl border border-accent bg-accentDeep px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
                   >
-                    + себе
+                    Добавить себе
                   </button>
                 ) : (
                   <Link
@@ -454,7 +454,7 @@ export default function HomePage() {
           aria-label="Добавить песню"
           className="btn-ink pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full shadow-xl shadow-black/25 active:scale-90 transition-transform"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
             <path d="M12 5v14M5 12h14" />
           </svg>
         </Link>
