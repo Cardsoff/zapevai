@@ -89,18 +89,6 @@ export default function AuthPage() {
 
   return (
     <main className="pb-safe pt-[max(env(safe-area-inset-top),1.5rem)]">
-      <div className="mb-1 flex items-center gap-3">
-        <span className="rule flex-1" />
-        <p className="kicker">
-          {mode === "signin"
-            ? "Вход в песенник"
-            : mode === "signup"
-            ? "Новый песенник"
-            : "Восстановление пароля"}
-        </p>
-        <span className="rule flex-1" />
-      </div>
-
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

@@ -162,17 +162,8 @@ export default function HomePage() {
   return (
     <main className="pb-safe pt-[max(env(safe-area-inset-top),1.5rem)]">
       {/* Журнальная шапка */}
-      <div className="mb-1 flex items-center gap-3">
-        <span className="w-[72px] shrink-0" />
-        <span className="rule flex-1" />
-        <p className="kicker">
-          Песенник
-          {songs && songs.length > 0
-            ? ` · ${songs.length} ${plural(songs.length)}`
-            : ""}
-        </p>
-        <span className="rule flex-1" />
-        <span className="flex w-[72px] shrink-0 justify-end gap-2">
+      <div className="mb-1 flex items-center justify-end">
+        <span className="flex shrink-0 justify-end gap-2">
           <button
             onClick={cycleTheme}
             aria-label="Сменить тему"

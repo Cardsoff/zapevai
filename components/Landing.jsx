@@ -24,12 +24,16 @@ export default function Landing({ onTry }) {
 
   return (
     <main className="flex min-h-[100svh] flex-col pb-8 pt-[max(env(safe-area-inset-top),2rem)]">
-      {/* Шапка */}
-      <div className="mb-8 flex items-center gap-3">
-        <span className="rule flex-1" />
-        <p className="kicker">Песенник · Запевай</p>
-        <span className="rule flex-1" />
-      </div>
+      {/* Логотип */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-6 text-center"
+      >
+        <h2 className="font-serif text-4xl font-bold tracking-tight">
+          Запе<span className="italic text-accent">вай</span>
+        </h2>
+      </motion.div>
 
       {/* Оффер */}
       <div className="flex flex-1 flex-col items-center justify-center text-center">
