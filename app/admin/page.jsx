@@ -63,6 +63,7 @@ export default function AdminPage() {
   const [allSongs, setAllSongs] = useState(null);
   const [songQuery, setSongQuery] = useState("");
   const [reports, setReports] = useState(null);
+  const [period, setPeriod] = useState(null); // дней; null = всё время
   const [stats, setStats] = useState(null);
   const [expanded, setExpanded] = useState(null); // user_id раскрытой карточки
   const [userSongs, setUserSongs] = useState({}); // user_id -> песни
@@ -72,7 +73,7 @@ export default function AdminPage() {
       setAllowed(ok);
       if (ok) {
         adminListUsers().then(setUsers);
-        adminStats().then(setStats);
+        adminStats(null).then(setStats);
         adminSongs().then(setAllSongs);
         adminReports().then(setReports);
       }
@@ -89,6 +90,12 @@ export default function AdminPage() {
       const songs = await adminUserSongs(u.user_id);
       setUserSongs((m) => ({ ...m, [u.user_id]: songs }));
     }
+  }
+
+  async function changePeriod(days) {
+    setPeriod(days);
+    setStats(null);
+    setStats(await adminStats(days));
   }
 
   async function deleteSong(sng) {
@@ -206,50 +213,54 @@ export default function AdminPage() {
       </div>
 
       {tab === "stats" && (
-        stats === null ? (
+        <>
+          {/* Период */}
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {[
+              { d: 1, n: "День" },
+              { d: 7, n: "Неделя" },
+              { d: 30, n: "Месяц" },
+              { d: 90, n: "3 мес" },
+              { d: 182, n: "Полгода" },
+              { d: 365, n: "Год" },
+              { d: null, n: "Всё время" },
+            ].map((p) => (
+              <button
+                key={p.n}
+                onClick={() => changePeriod(p.d)}
+                className={
+                  "rounded-full border px-3 py-1.5 text-xs font-semibold transition-all " +
+                  (period === p.d
+                    ? "border-accent bg-accent text-white"
+                    : "border-line bg-card")
+                }
+              >
+                {p.n}
+              </button>
+            ))}
+          </div>
+
+        {stats === null ? (
           <div className="glass animate-pulse rounded-xl3 p-10 text-center text-sub">
             Загрузка…
           </div>
         ) : (
           <>
-            <div className="mb-4 grid grid-cols-2 gap-2">
+            <div className="mb-6 grid grid-cols-2 gap-2">
               {[
-                { v: stats.total_users, l: "всего регистраций", e: "👥" },
-                { v: stats.active_week, l: "активны за неделю", e: "🔥" },
-                { v: stats.pro_users, l: "с тарифом Про", e: "⭐" },
-                { v: stats.total_songs, l: "песен в базе", e: "🎵" },
+                { v: stats.regs, l: period === null ? "всего регистраций" : "новых регистраций", e: "👥" },
+                { v: stats.active, l: "активных", e: "🔥" },
+                { v: stats.pro, l: "с тарифом Про", e: "⭐" },
+                { v: stats.songs, l: "новых песен", e: "🎵" },
               ].map((c) => (
                 <div key={c.l} className="glass rounded-xl2 p-4">
                   <p className="text-base">{c.e}</p>
                   <p className="font-serif text-3xl font-bold italic text-accent tabular-nums">
-                    {c.v}
+                    {period === null ? c.v : "+" + c.v}
                   </p>
                   <p className="text-xs text-sub">{c.l}</p>
                 </div>
               ))}
-            </div>
-
-            {/* Прирост пользователей по периодам */}
-            <div className="glass mb-6 rounded-xl2 p-4">
-              <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sub">
-                📈 Прирост пользователей
-              </p>
-              <div className="grid grid-cols-5 gap-1 text-center">
-                {[
-                  { v: stats.today, l: "день" },
-                  { v: stats.week, l: "неделя" },
-                  { v: stats.month, l: "месяц" },
-                  { v: stats.year, l: "год" },
-                  { v: stats.total_users, l: "всё время" },
-                ].map((c) => (
-                  <div key={c.l}>
-                    <p className="font-serif text-2xl font-bold italic text-accent tabular-nums">
-                      +{c.v}
-                    </p>
-                    <p className="text-[10px] text-sub">{c.l}</p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             <div className="mb-3 flex items-center gap-3">
@@ -292,7 +303,8 @@ export default function AdminPage() {
               )}
             </div>
           </>
-        )
+        )}
+        </>
       )}
 
       {tab === "users" && (
