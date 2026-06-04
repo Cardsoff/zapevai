@@ -45,6 +45,7 @@ export default function SongScreen({ id }) {
   const [reportText, setReportText] = useState("");
   const [reportDone, setReportDone] = useState(false);
   const [reportFile, setReportFile] = useState(null);
+  const [editNote, setEditNote] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -128,8 +129,6 @@ export default function SongScreen({ id }) {
     await removeSong(id);
     router.push("/");
   }
-
-  const [editNote, setEditNote] = useState(null);
 
   async function saveLyrics() {
     const res = await updateSongLyrics(id, draft);
