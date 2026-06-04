@@ -17,7 +17,7 @@ import WaveLine, { roman } from "@/components/Decor";
 export default function HomePage() {
   const [songs, setSongs] = useState(null);
   const [due, setDue] = useState([]);
-  const [stats, setStats] = useState({ streak: 0, totalSongs: 0, mastered: 0 });
+  const [stats, setStats] = useState({ streak: 0, best: 0, totalSongs: 0, mastered: 0 });
   const [mastery, setMastery] = useState({});
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
@@ -102,6 +102,12 @@ export default function HomePage() {
           <p className="text-[15px] font-semibold">
             {stats.streak > 0 ? "дней подряд вы поёте" : "начни серию сегодня"}
           </p>
+          {stats.best > 1 && (
+            <p className="mt-0.5 text-xs text-sub">
+              лучшая серия — {stats.best}{" "}
+              {stats.best % 10 === 1 && stats.best % 100 !== 11 ? "день" : stats.best % 10 >= 2 && stats.best % 10 <= 4 && (stats.best % 100 < 12 || stats.best % 100 > 14) ? "дня" : "дней"}
+            </p>
+          )}
           <div className="mt-2 flex gap-1.5">
             {Array.from({ length: 7 }).map((_, i) => (
               <span
@@ -126,8 +132,11 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-6 rounded-xl2 bg-accent p-5 text-[#fdf6ec]"
+          className="relative mb-6 overflow-hidden rounded-xl2 bg-accent p-5 text-[#fdf6ec]"
         >
+          <span className="pointer-events-none absolute -right-2 -top-6 select-none font-serif text-[120px] italic leading-none text-white/10">
+            ♪
+          </span>
           <p className="kicker mb-2 !text-accent2">Пора повторить</p>
           <p className="font-serif text-xl font-bold leading-snug">
             «{firstDue.title}» <span className="italic font-medium">ждёт вас</span>

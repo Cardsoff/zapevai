@@ -15,21 +15,6 @@
   --glow-opacity: 0.18;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #ece4d4;
-    --sub: #a3957f;
-    --bg: #171310;
-    --card: rgba(36, 29, 22, 0.92);
-    --line: rgba(236, 228, 212, 0.12);
-    --wine: #c4707c;
-    --gold: #d4a94e;
-    --good: #8fbf72;
-    --bad: #e07070;
-    --glow-opacity: 0.14;
-  }
-}
-
 html,
 body {
   background: var(--bg);
