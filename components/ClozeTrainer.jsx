@@ -1,46 +1,46 @@
 "use client";
 
-// Режим «Пропуски слов»: часть слов скрыта, тап открывает слово,
-// затем самопроверка «Помнил / Забыл».
+// Режим «Пропуски слов»: часть слов скрыта.
+// Тап по слову открывает его (= «забыл»). Нетронутые слова = «вспомнил».
+// В конце кнопка «Готово» — счёт считается автоматически.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { parseLyrics, pickHiddenWords } from "@/lib/lyrics";
-import { tapFeedback } from "@/lib/feedback";
-import SelfCheckBar from "./SelfCheckBar";
-import TrainProgress from "./TrainProgress";
+import { tapFeedback, goodFeedback } from "@/lib/feedback";
+import ClozeIntro, { clozeIntroHidden } from "./ClozeIntro";
 
 export default function ClozeTrainer({ lyrics, level, onFinish }) {
   const parsed = useMemo(() => parseLyrics(lyrics), [lyrics]);
   const hidden = useMemo(() => pickHiddenWords(parsed, level), [parsed, level]);
 
-  const [revealed, setRevealed] = useState({}); // i -> true
-  const [answers, setAnswers] = useState({}); // i -> bool (помнил?)
-  const [pending, setPending] = useState(null); // {i, text}
+  // null — решаем, показывать ли инструкцию (чтобы не мигало при загрузке)
+  const [intro, setIntro] = useState(null);
+  const [revealed, setRevealed] = useState({}); // i -> true (открыл = забыл)
+
+  useEffect(() => {
+    setIntro(!clozeIntroHidden());
+  }, []);
 
   const total = hidden.size;
-  const done = Object.keys(answers).length;
+  const opened = Object.keys(revealed).length;
 
   function tapWord(token) {
-    if (pending || revealed[token.i]) return;
+    if (revealed[token.i]) return;
     tapFeedback();
     setRevealed((r) => ({ ...r, [token.i]: true }));
-    setPending({ i: token.i, text: token.text });
   }
 
-  function answer(ok) {
-    const newAnswers = { ...answers, [pending.i]: ok };
-    setAnswers(newAnswers);
-    setPending(null);
-    if (Object.keys(newAnswers).length === total) {
-      const good = Object.values(newAnswers).filter(Boolean).length;
-      setTimeout(() => onFinish(Math.round((good / total) * 100)), 350);
-    }
+  function finish() {
+    goodFeedback();
+    onFinish(Math.round(((total - opened) / total) * 100));
   }
+
+  if (intro === null) return null;
+  if (intro) return <ClozeIntro onStart={() => setIntro(false)} />;
 
   return (
-    <div className="pb-safe">
-      <TrainProgress done={done} total={total} />
+    <div className="pb-32">
       <div className="space-y-6">
         {parsed.sections.map((sec, si) => (
           <div key={si} className="glass rounded-xl3 p-5">
@@ -49,8 +49,7 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
                 {line.tokens.map((t, ti) => {
                   if (t.type === "sep") return <span key={ti}>{t.text}</span>;
                   if (!hidden.has(t.i)) return <span key={ti}>{t.text}</span>;
-                  const isOpen = revealed[t.i];
-                  if (!isOpen) {
+                  if (!revealed[t.i]) {
                     return (
                       <span
                         key={ti}
@@ -62,21 +61,13 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
                       </span>
                     );
                   }
-                  const ok = answers[t.i];
                   return (
                     <motion.span
                       key={ti}
                       initial={{ opacity: 0, filter: "blur(6px)", scale: 0.9 }}
                       animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
                       transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                      className={
-                        "inline-block rounded-md px-0.5 font-medium " +
-                        (ok === undefined
-                          ? "text-accent"
-                          : ok
-                          ? "text-good"
-                          : "text-bad")
-                      }
+                      className="inline-block rounded-md px-0.5 font-medium text-bad"
                     >
                       {t.text}
                     </motion.span>
@@ -87,14 +78,29 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
           </div>
         ))}
       </div>
+
       <p className="mt-5 text-center text-sm text-sub">
-        Вспомни скрытое слово, затем коснись его для проверки
+        Забыл слово — коснись его. Помнишь — иди дальше.
       </p>
-      <SelfCheckBar
-        visible={Boolean(pending)}
-        text={pending?.text || ""}
-        onAnswer={answer}
-      />
+
+      {/* Нижняя панель: счётчик + «Готово» */}
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-lg px-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
+        <div className="glass rounded-xl3 p-4 shadow-2xl shadow-black/10">
+          <p className="mb-3 text-center text-sm text-sub">
+            Открыто:{" "}
+            <span className="font-semibold text-ink tabular-nums">
+              {opened} из {total}
+            </span>{" "}
+            скрытых
+          </p>
+          <button
+            onClick={finish}
+            className="w-full rounded-2xl btn-gradient py-3.5 text-base font-semibold active:scale-95 transition-transform"
+          >
+            Готово
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
