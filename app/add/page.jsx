@@ -213,12 +213,6 @@ export default function AddSongPage() {
         </a>
       </p>
 
-      <p className="mt-3 px-1 text-center text-[11px] leading-snug text-sub">
-        Добавляя текст, ты подтверждаешь, что используешь его для личного
-        обучения и имеешь право на загрузку —{" "}
-        <a href="/terms" className="underline">условия</a>
-      </p>
-
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={() => submit(false)}
