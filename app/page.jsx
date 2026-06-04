@@ -11,6 +11,8 @@ import {
   getProgress,
   songMastery,
   migrateGuestData,
+  searchSongs,
+  addToLibrary,
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
 import WaveLine, { roman } from "@/components/Decor";
@@ -25,6 +27,8 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [landing, setLanding] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [baseResults, setBaseResults] = useState(null); // поиск по общей базе
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -71,6 +75,30 @@ export default function HomePage() {
       (s.artist || "").toLowerCase().includes(q)
     );
   });
+
+  // поиск по общей базе (только для вошедших), исключая то, что уже в репертуаре
+  useEffect(() => {
+    if (!user || query.trim().length < 2) {
+      setBaseResults(null);
+      return;
+    }
+    const mineIds = new Set((songs || []).map((s) => s.id));
+    setSearching(true);
+    const t = setTimeout(async () => {
+      const res = await searchSongs(query);
+      setBaseResults((res || []).filter((s) => !mineIds.has(s.id)).slice(0, 8));
+      setSearching(false);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [query, user, songs]);
+
+  async function addFromBase(id) {
+    await addToLibrary(id);
+    const fresh = await listMySongs();
+    setSongs(fresh);
+    setQuery("");
+    setBaseResults(null);
+  }
 
   const firstDue = due[0];
 
@@ -214,13 +242,51 @@ export default function HomePage() {
         )}
       </div>
 
-      {songs && songs.length > 3 && (
+      {songs && (songs.length > 3 || user) && (
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Поиск по репертуару"
+          placeholder={user ? "Поиск по моим и общей базе" : "Поиск по репертуару"}
           className="glass mb-4 w-full rounded-xl2 px-4 py-3 text-[16px]"
         />
+      )}
+
+      {/* Результаты из общей базы */}
+      {user && query.trim().length >= 2 && (
+        <div className="mb-4">
+          <p className="kicker mb-2 !text-[10px]">
+            {searching ? "Ищем в общей базе…" : "Из общей базы"}
+          </p>
+          {baseResults && baseResults.length === 0 && !searching ? (
+            <p className="glass rounded-xl2 p-3 text-center font-serif text-sm italic text-sub">
+              В общей базе ничего не нашлось
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {(baseResults || []).map((s) => (
+                <div
+                  key={s.id}
+                  className="glass flex items-center gap-3 rounded-xl2 p-3 pl-4"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="kicker block truncate !text-[10px]">
+                      {s.artist || "Без исполнителя"}
+                    </span>
+                    <span className="block truncate font-serif text-[15px] font-bold">
+                      {s.title}
+                    </span>
+                  </span>
+                  <button
+                    onClick={() => addFromBase(s.id)}
+                    className="shrink-0 rounded-xl border border-accent bg-accent px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
+                  >
+                    + себе
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {songs === null ? (
