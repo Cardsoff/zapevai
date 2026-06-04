@@ -49,8 +49,9 @@ export default function Landing({ onTry }) {
             ) : open[i] ? (
               <motion.span
                 key={i}
-                initial={{ opacity: 0, filter: "blur(6px)" }}
+                initial={{ opacity: 0.5, filter: "blur(8px)" }}
                 animate={{ opacity: 1, filter: "blur(0px)" }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 className="italic text-accent"
               >
                 {w.t}{" "}
@@ -62,8 +63,7 @@ export default function Landing({ onTry }) {
                   tapFeedback();
                   setOpen((o) => ({ ...o, [i]: true }));
                 }}
-                className="blank cursor-pointer px-1"
-                style={{ animationDelay: `${i * 0.5}s` }}
+                className="blank blank-lg px-1"
               >
                 {w.t}{" "}
               </span>

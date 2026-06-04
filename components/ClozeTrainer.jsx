@@ -53,11 +53,7 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
                     return (
                       <span
                         key={ti}
-                        className="blank px-0.5"
-                        style={{
-                          minWidth: `${t.text.length * 0.55 + 0.6}em`,
-                          animationDelay: `${(t.i % 6) * 0.4}s`,
-                        }}
+                        className="blank"
                         onClick={() => tapWord(t)}
                       >
                         {t.text}
@@ -67,9 +63,9 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
                   return (
                     <motion.span
                       key={ti}
-                      initial={{ opacity: 0, filter: "blur(6px)", scale: 0.9 }}
-                      animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                      initial={{ opacity: 0.5, filter: "blur(5.5px)" }}
+                      animate={{ opacity: 1, filter: "blur(0px)" }}
+                      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                       className="inline-block rounded-md px-0.5 font-semibold italic text-accent"
                     >
                       {t.text}

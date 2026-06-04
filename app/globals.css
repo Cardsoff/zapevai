@@ -141,29 +141,23 @@ body {
   color: #fdf9f0;
 }
 
-/* скрытое слово — чернильная плашка-подчёркивание */
+/* скрытое слово — «чистый туман»: само слово размыто, тап наводит фокус */
 .blank {
   display: inline-block;
-  border-radius: 3px 3px 0 0;
-  background: linear-gradient(
-    100deg,
-    color-mix(in srgb, var(--ink) 8%, transparent) 25%,
-    color-mix(in srgb, var(--gold) 30%, transparent) 50%,
-    color-mix(in srgb, var(--ink) 8%, transparent) 75%
-  );
-  background-size: 220% 100%;
-  animation: blankShimmer 2.6s ease-in-out infinite;
-  border-bottom: 2px solid color-mix(in srgb, var(--wine) 55%, transparent);
-  color: transparent;
+  padding: 0 2px;
+  border-radius: 4px;
+  color: color-mix(in srgb, var(--ink) 62%, var(--bg));
+  filter: blur(5.5px);
+  opacity: 0.5;
   user-select: none;
   cursor: pointer;
 }
-@keyframes blankShimmer {
-  0% { background-position: 120% 0; }
-  100% { background-position: -100% 0; }
+.blank-lg {
+  filter: blur(8px);
+}
 }
 .blank:active {
-  background: color-mix(in srgb, var(--wine) 30%, transparent);
+  opacity: 0.65;
 }
 
 /* ---- Эдиториал ---- */
