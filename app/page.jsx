@@ -10,6 +10,7 @@ import {
   getStats,
   getProgress,
   songMastery,
+  migrateGuestData,
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
 import WaveLine, { roman } from "@/components/Decor";
@@ -27,6 +28,13 @@ export default function HomePage() {
 
   useEffect(() => {
     (async () => {
+      // если гость только что вошёл — перенести его данные в облако
+      const u0 = await getUser();
+      if (u0) {
+        try {
+          await migrateGuestData();
+        } catch {}
+      }
       const [s, d, st, u] = await Promise.all([
         listMySongs(),
         getDueSongs(),
