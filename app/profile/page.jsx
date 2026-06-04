@@ -227,7 +227,7 @@ export default function ProfilePage() {
           href="/admin"
           className="glass mt-4 block rounded-xl2 p-4 text-center font-semibold active:scale-[0.99] transition-transform"
         >
-          🛠 Массовая загрузка песен
+          🛠 Админ-панель
         </Link>
       )}
 
