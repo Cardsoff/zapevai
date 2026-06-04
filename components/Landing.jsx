@@ -59,7 +59,7 @@ export default function Landing({ onTry }) {
                   setOpen((o) => ({ ...o, [i]: true }));
                 }}
                 className="blank cursor-pointer px-1"
-                style={{ minWidth: `${w.t.length * 0.5 + 0.6}em` }}
+                style={{ animationDelay: `${i * 0.5}s` }}
               >
                 {w.t}{" "}
               </span>

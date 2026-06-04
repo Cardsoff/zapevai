@@ -590,7 +590,9 @@ export default function AdminPage() {
               {reports.map((r) => (
                 <div key={r.id} className="glass rounded-xl2 p-4">
                   <p className="font-serif text-[15px] font-bold">
-                    {r.song_title || "(песня удалена)"}
+                    {r.song_id === null
+                      ? "💡 Предложение"
+                      : r.song_title || "(песня удалена)"}
                     {r.song_artist ? (
                       <span className="font-sans text-xs font-normal text-sub">
                         {" "}— {r.song_artist}

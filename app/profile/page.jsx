@@ -5,7 +5,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import { getStats, listLearnedSongs, getPlan, getMyReferralCode, ADMIN_EMAILS } from "@/lib/storage";
+import {
+  getStats,
+  listLearnedSongs,
+  getPlan,
+  getMyReferralCode,
+  getMyProfile,
+  updateMyProfile,
+  sendSuggestion,
+  ADMIN_EMAILS,
+} from "@/lib/storage";
 import {
   getUser,
   signOut,
@@ -31,6 +40,9 @@ export default function ProfilePage() {
   const [newPass2, setNewPass2] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [secMsg, setSecMsg] = useState(null);
+  const [ideaOpen, setIdeaOpen] = useState(false);
+  const [ideaText, setIdeaText] = useState("");
+  const [ideaMsg, setIdeaMsg] = useState(null);
   const [refCode, setRefCode] = useState(null);
 
   useEffect(() => {
@@ -371,6 +383,50 @@ export default function ProfilePage() {
         >
           🛠 Админ-панель
         </Link>
+      )}
+
+      {/* Предложить улучшение */}
+      {user && (
+        <>
+          <button
+            onClick={() => setIdeaOpen(!ideaOpen)}
+            className="glass mt-4 w-full rounded-xl2 py-3.5 font-semibold active:scale-[0.98] transition-transform"
+          >
+            💡 Предложить улучшение
+          </button>
+          {ideaOpen && (
+            <div className="glass mt-2 rounded-xl2 p-4">
+              <textarea
+                value={ideaText}
+                onChange={(e) => setIdeaText(e.target.value)}
+                rows={3}
+                placeholder="Чего не хватает? Что сделать удобнее?"
+                className="w-full resize-none rounded-xl2 border border-line bg-card px-3 py-2.5 text-[15px]"
+              />
+              <button
+                onClick={async () => {
+                  if (ideaText.trim().length < 3) return;
+                  const r = await sendSuggestion(ideaText);
+                  if (!r.error) {
+                    setIdeaMsg("Спасибо! Предложение у редакции ✓");
+                    setIdeaText("");
+                    setIdeaOpen(false);
+                    setTimeout(() => setIdeaMsg(null), 3000);
+                  }
+                }}
+                disabled={ideaText.trim().length < 3}
+                className="btn-gradient mt-2 w-full rounded-xl2 py-2.5 text-sm font-semibold disabled:opacity-40"
+              >
+                Отправить
+              </button>
+            </div>
+          )}
+          {ideaMsg && (
+            <p className="mt-2 text-center font-serif text-sm italic text-good">
+              {ideaMsg}
+            </p>
+          )}
+        </>
       )}
 
       <button

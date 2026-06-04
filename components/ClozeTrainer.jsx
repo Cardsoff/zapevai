@@ -54,7 +54,10 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
                       <span
                         key={ti}
                         className="blank px-0.5"
-                        style={{ minWidth: `${t.text.length * 0.55 + 0.6}em` }}
+                        style={{
+                          minWidth: `${t.text.length * 0.55 + 0.6}em`,
+                          animationDelay: `${(t.i % 6) * 0.4}s`,
+                        }}
                         onClick={() => tapWord(t)}
                       >
                         {t.text}
