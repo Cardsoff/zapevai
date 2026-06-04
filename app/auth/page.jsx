@@ -33,6 +33,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+  const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
 
@@ -72,8 +73,10 @@ export default function AuthPage() {
       );
       return;
     }
-    const fn = mode === "signin" ? signInWithEmail : signUpWithEmail;
-    const { error } = await fn(email.trim(), password);
+    const { error } =
+      mode === "signin"
+        ? await signInWithEmail(email.trim(), password)
+        : await signUpWithEmail(email.trim(), password, name);
     setBusy(false);
     if (error) {
       setMsg(ruError(error.message));
@@ -139,6 +142,14 @@ export default function AuthPage() {
         </div>
 
         <div className="space-y-3">
+          {mode === "signup" && (
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Имя (как к тебе обращаться)"
+              className="w-full rounded-xl2 border border-line bg-card px-4 py-3.5 text-[16px]"
+            />
+          )}
           <input
             type="email"
             value={email}

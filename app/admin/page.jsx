@@ -338,6 +338,7 @@ export default function AdminPage() {
                   <span className="block text-xs text-sub">
                     рег. {fmtDate(u.created_at)} ·{" "}
                     {u.songs_count} {u.songs_count === 1 ? "песня" : "песен"} ·{" "}
+                    пригласил {u.invited_count ?? 0} ·{" "}
                     <span
                       className={
                         u.plan === "pro" ? "font-semibold text-good" : ""

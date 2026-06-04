@@ -6,7 +6,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import { getStats, listLearnedSongs, getPlan, getMyReferralCode, ADMIN_EMAILS } from "@/lib/storage";
-import { getUser, signOut, supabaseEnabled } from "@/lib/supabase";
+import {
+  getUser,
+  signOut,
+  supabaseEnabled,
+  updatePassword,
+  changeEmail,
+} from "@/lib/supabase";
 import { toggleSound, soundEnabled } from "@/lib/feedback";
 
 export default function ProfilePage() {
@@ -18,12 +24,22 @@ export default function ProfilePage() {
   const [theme, setTheme] = useState("light");
   const [plan, setPlan] = useState(null);
   const [showLearned, setShowLearned] = useState(false);
+  const [form, setForm] = useState(null); // {name, city, about}
+  const [formMsg, setFormMsg] = useState(null);
+  const [showSecurity, setShowSecurity] = useState(false);
+  const [newPass, setNewPass] = useState("");
+  const [newPass2, setNewPass2] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [secMsg, setSecMsg] = useState(null);
   const [refCode, setRefCode] = useState(null);
 
   useEffect(() => {
     getStats().then(setStats);
     listLearnedSongs().then(setLearned);
     getPlan().then(setPlan);
+    getMyProfile().then((pr) => {
+      if (pr) setForm({ name: pr.name || "", city: pr.city || "", about: pr.about || "" });
+    });
     getMyReferralCode().then(setRefCode);
     getUser().then(setUser);
     setSound(soundEnabled());
@@ -132,6 +148,130 @@ export default function ProfilePage() {
             </p>
           )}
         </div>
+      )}
+
+      {/* Анкета */}
+      {user && form && (
+        <>
+          <div className="mb-3 flex items-center gap-3">
+            <h2 className="font-serif text-xl font-bold">Анкета</h2>
+            <span className="rule flex-1" />
+          </div>
+          <div className="glass mb-6 space-y-3 rounded-xl2 p-4">
+            <input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Имя"
+              className="w-full rounded-xl2 border border-line bg-card px-4 py-3 text-[16px]"
+            />
+            <input
+              value={form.city}
+              onChange={(e) => setForm({ ...form, city: e.target.value })}
+              placeholder="Город"
+              className="w-full rounded-xl2 border border-line bg-card px-4 py-3 text-[16px]"
+            />
+            <textarea
+              value={form.about}
+              onChange={(e) => setForm({ ...form, about: e.target.value })}
+              placeholder="О себе (пара слов)"
+              rows={2}
+              className="w-full resize-none rounded-xl2 border border-line bg-card px-4 py-3 text-[16px]"
+            />
+            {formMsg && (
+              <p className="text-center font-serif text-sm italic text-good">
+                {formMsg}
+              </p>
+            )}
+            <button
+              onClick={async () => {
+                const r = await updateMyProfile(form);
+                setFormMsg(r.error ? "Не сохранилось, попробуй ещё" : "Сохранено ✓");
+                setTimeout(() => setFormMsg(null), 2500);
+              }}
+              className="btn-gradient w-full rounded-xl2 py-3 font-semibold active:scale-[0.98] transition-transform"
+            >
+              Сохранить анкету
+            </button>
+          </div>
+
+          {/* Безопасность */}
+          <button
+            onClick={() => setShowSecurity(!showSecurity)}
+            className="glass mb-3 flex w-full items-center gap-3 rounded-xl2 p-4 active:scale-[0.99] transition-transform"
+          >
+            <span className="flex-1 text-left font-serif text-lg font-bold">
+              Пароль и почта
+            </span>
+            <span className="text-sub">{showSecurity ? "▲" : "▼"}</span>
+          </button>
+          {showSecurity && (
+            <div className="glass mb-6 space-y-3 rounded-xl2 p-4">
+              <p className="kicker !text-[10px]">Новый пароль</p>
+              <input
+                type="password"
+                value={newPass}
+                onChange={(e) => setNewPass(e.target.value)}
+                placeholder="Новый пароль (минимум 6 символов)"
+                className="w-full rounded-xl2 border border-line bg-card px-4 py-3 text-[16px]"
+              />
+              <input
+                type="password"
+                value={newPass2}
+                onChange={(e) => setNewPass2(e.target.value)}
+                placeholder="Повтори пароль"
+                className={
+                  "w-full rounded-xl2 border bg-card px-4 py-3 text-[16px] " +
+                  (newPass2 && newPass !== newPass2 ? "border-bad" : "border-line")
+                }
+              />
+              <button
+                onClick={async () => {
+                  if (newPass.length < 6 || newPass !== newPass2) return;
+                  const { error } = await updatePassword(newPass);
+                  setSecMsg(error ? "Не получилось: " + error.message : "Пароль обновлён ✓");
+                  if (!error) {
+                    setNewPass("");
+                    setNewPass2("");
+                  }
+                }}
+                disabled={newPass.length < 6 || newPass !== newPass2}
+                className="btn-gradient w-full rounded-xl2 py-3 font-semibold disabled:opacity-40"
+              >
+                Сменить пароль
+              </button>
+
+              <p className="kicker pt-2 !text-[10px]">Сменить почту</p>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="Новая почта"
+                className="w-full rounded-xl2 border border-line bg-card px-4 py-3 text-[16px]"
+              />
+              <button
+                onClick={async () => {
+                  if (!newEmail.includes("@")) return;
+                  const { error } = await changeEmail(newEmail);
+                  setSecMsg(
+                    error
+                      ? "Не получилось: " + error.message
+                      : "Письмо для подтверждения отправлено на новую почту"
+                  );
+                  if (!error) setNewEmail("");
+                }}
+                disabled={!newEmail.includes("@")}
+                className="glass w-full rounded-xl2 py-3 font-semibold disabled:opacity-40"
+              >
+                Сменить почту
+              </button>
+              {secMsg && (
+                <p className="text-center font-serif text-sm italic text-accent">
+                  {secMsg}
+                </p>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* Настройки */}
