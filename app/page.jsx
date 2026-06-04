@@ -448,7 +448,7 @@ export default function HomePage() {
       )}
 
       {/* Кнопка добавления */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-[max(env(safe-area-inset-bottom),1.25rem)] z-20 mx-auto flex w-full max-w-lg justify-end px-4">
+      <div className="pointer-events-none fixed inset-x-0 top-1/2 z-20 mx-auto flex w-full max-w-lg -translate-y-1/2 justify-end px-4">
         <Link
           href="/add"
           aria-label="Добавить песню"
