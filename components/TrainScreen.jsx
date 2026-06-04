@@ -67,6 +67,7 @@ export default function TrainScreen({ id, mode, level }) {
       {mode === "cloze" && (
         <ClozeTrainer
           key={round}
+          songId={id}
           lyrics={song.lyrics}
           level={level}
           onFinish={finish}

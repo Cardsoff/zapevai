@@ -7,12 +7,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { parseLyrics, pickHiddenWords } from "@/lib/lyrics";
+import { getWordStats, saveWordStatsRun } from "@/lib/storage";
 import { tapFeedback, goodFeedback } from "@/lib/feedback";
 import ClozeIntro, { clozeIntroHidden } from "./ClozeIntro";
 
-export default function ClozeTrainer({ lyrics, level, onFinish }) {
+export default function ClozeTrainer({ songId, lyrics, level, onFinish }) {
   const parsed = useMemo(() => parseLyrics(lyrics), [lyrics]);
-  const hidden = useMemo(() => pickHiddenWords(parsed, level), [parsed, level]);
+  const [hidden, setHidden] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      let stats = {};
+      try {
+        stats = await getWordStats(songId);
+      } catch {}
+      if (alive) setHidden(pickHiddenWords(parsed, level, stats));
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [parsed, level, songId]);
 
   // null — решаем, показывать ли инструкцию (чтобы не мигало при загрузке)
   const [intro, setIntro] = useState(null);
@@ -22,7 +37,7 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
     setIntro(!clozeIntroHidden());
   }, []);
 
-  const total = hidden.size;
+  const total = hidden ? hidden.size : 0;
   const opened = Object.keys(revealed).length;
 
   function tapWord(token) {
@@ -33,10 +48,18 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
 
   function finish() {
     goodFeedback();
+    // статистика для адаптивных пропусков (не блокируем переход)
+    try {
+      saveWordStatsRun(
+        songId,
+        [...hidden],
+        Object.keys(revealed).map(Number)
+      );
+    } catch {}
     onFinish(Math.round(((total - opened) / total) * 100));
   }
 
-  if (intro === null) return null;
+  if (intro === null || hidden === null) return null;
   if (intro) return <ClozeIntro onStart={() => setIntro(false)} />;
 
   return (
