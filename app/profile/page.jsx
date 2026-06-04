@@ -293,7 +293,7 @@ export default function ProfilePage() {
               className={
                 "flex-1 rounded-xl2 border py-2.5 text-sm font-semibold transition-all " +
                 (theme === t.id
-                  ? "border-accent bg-accent text-white"
+                  ? "border-accent bg-accentDeep text-white"
                   : "border-line bg-card")
               }
             >

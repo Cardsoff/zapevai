@@ -214,7 +214,7 @@ export default function HomePage() {
                 className={
                   "flex h-5 w-5 items-center justify-center rounded-full text-[10px] " +
                   (i < Math.min(stats.streak, 7)
-                    ? "bg-accent text-white"
+                    ? "bg-accentDeep text-white"
                     : "border border-dashed border-line text-transparent")
                 }
               >
@@ -231,7 +231,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="relative mb-6 overflow-hidden rounded-xl2 bg-accent p-5 text-[#fdf6ec]"
+          className="relative mb-6 overflow-hidden rounded-xl2 bg-accentDeep p-5 text-[#fdf6ec]"
         >
           <span className="pointer-events-none absolute -right-2 -top-6 select-none font-serif text-[120px] italic leading-none text-white/10">
             ♪
@@ -317,7 +317,7 @@ export default function HomePage() {
                   </span>
                   <button
                     onClick={() => addFromBase(s.id)}
-                    className="shrink-0 rounded-xl border border-accent bg-accent px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
+                    className="shrink-0 rounded-xl border border-accent bg-accentDeep px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
                   >
                     + себе
                   </button>

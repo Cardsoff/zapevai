@@ -207,7 +207,7 @@ export default function SongScreen({ id }) {
                 onClick={() => pick("cloze", lvl.level)}
                 animate={
                   active
-                    ? { scale: 1.02, backgroundColor: "var(--wine)" }
+                    ? { scale: 1.02, backgroundColor: "var(--wine-deep)" }
                     : { scale: 1 }
                 }
                 transition={{ type: "spring", stiffness: 300, damping: 22 }}
@@ -287,7 +287,7 @@ export default function SongScreen({ id }) {
               }
               animate={
                 active
-                  ? { scale: 1.02, backgroundColor: "var(--wine)" }
+                  ? { scale: 1.02, backgroundColor: "var(--wine-deep)" }
                   : { scale: 1 }
               }
               transition={{ type: "spring", stiffness: 300, damping: 22 }}

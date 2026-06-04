@@ -227,7 +227,7 @@ export default function AdminPage() {
             className={
               "rounded-xl2 border px-3 py-2 text-xs font-semibold transition-all " +
               (tab === t.id
-                ? "border-accent bg-accent text-white"
+                ? "border-accent bg-accentDeep text-white"
                 : "border-line bg-card")
             }
           >
@@ -260,7 +260,7 @@ export default function AdminPage() {
                 className={
                   "rounded-full border px-3 py-1.5 text-xs font-semibold transition-all " +
                   (period === p.d
-                    ? "border-accent bg-accent text-white"
+                    ? "border-accent bg-accentDeep text-white"
                     : "border-line bg-card")
                 }
               >
@@ -383,7 +383,7 @@ export default function AdminPage() {
                     "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all " +
                     (u.plan === "pro"
                       ? "border-line bg-card text-sub"
-                      : "border-accent bg-accent text-white")
+                      : "border-accent bg-accentDeep text-white")
                   }
                 >
                   {u.plan === "pro" ? "Снять Про" : "Выдать Про"}

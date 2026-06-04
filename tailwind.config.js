@@ -14,6 +14,7 @@ module.exports = {
         card: "var(--card)",
         line: "var(--line)",
         accent: "var(--wine)",
+        accentDeep: "var(--wine-deep)",
         accent2: "var(--gold)",
         accent3: "var(--gold)",
         good: "var(--good)",
