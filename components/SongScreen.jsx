@@ -4,12 +4,19 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import ProgressRing from "@/components/ProgressRing";
-import { getSong, getProgress, removeSong, songMastery } from "@/lib/storage";
+import {
+  getSong,
+  getProgress,
+  removeSong,
+  setLearned,
+  songMastery,
+} from "@/lib/storage";
 import { CLOZE_LEVELS } from "@/lib/lyrics";
 import { isDue } from "@/lib/srs";
+import { goodFeedback, tapFeedback } from "@/lib/feedback";
 
 export default function SongScreen({ id }) {
   const router = useRouter();
@@ -17,12 +24,15 @@ export default function SongScreen({ id }) {
   const [progress, setProgress] = useState(null);
   const [showLyrics, setShowLyrics] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [selected, setSelected] = useState(null); // выбранный уровень
+  const [learned, setLearnedState] = useState(false);
 
   useEffect(() => {
     (async () => {
       const [s, p] = await Promise.all([getSong(id), getProgress(id)]);
       setSong(s);
       setProgress(p);
+      setLearnedState(Boolean(p?.learned));
     })();
   }, [id]);
 
@@ -45,13 +55,25 @@ export default function SongScreen({ id }) {
     if ((progress?.cloze?.[l] || 0) >= 90) nextLevel = Math.min(l + 1, 5);
   }
 
+  function pickLevel(level) {
+    tapFeedback();
+    setSelected(selected === level ? null : level);
+  }
+
+  async function toggleLearned() {
+    const next = !learned;
+    setLearnedState(next);
+    if (next) goodFeedback();
+    await setLearned(id, next);
+  }
+
   async function doDelete() {
     await removeSong(id);
     router.push("/");
   }
 
   return (
-    <main className="pb-safe">
+    <main className="pb-32">
       <Header title={song.title} />
 
       {/* Сводка */}
@@ -66,7 +88,10 @@ export default function SongScreen({ id }) {
           <p className="truncate text-sm text-sub">
             {song.artist || "Без исполнителя"}
           </p>
-          {due && (
+          {learned && (
+            <p className="mt-1 text-xs font-semibold text-good">🏆 Выучено</p>
+          )}
+          {due && !learned && (
             <p className="mt-1 text-xs font-semibold text-accent">
               ⏰ Пора повторить
             </p>
@@ -83,6 +108,7 @@ export default function SongScreen({ id }) {
           const score = progress?.cloze?.[lvl.level] || 0;
           const passed = score >= 90;
           const recommended = lvl.level === nextLevel;
+          const isSelected = selected === lvl.level;
           return (
             <motion.div
               key={lvl.level}
@@ -90,11 +116,15 @@ export default function SongScreen({ id }) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <Link
-                href={`/train/${id}?mode=cloze&level=${lvl.level}`}
+              <button
+                onClick={() => pickLevel(lvl.level)}
                 className={
-                  "glass flex items-center gap-3 rounded-xl2 p-4 active:scale-[0.98] transition-transform " +
-                  (recommended ? "ring-2 ring-accent/60" : "")
+                  "glass flex w-full items-center gap-3 rounded-xl2 p-4 text-left active:scale-[0.98] transition-all " +
+                  (isSelected
+                    ? "ring-2 ring-accent shadow-lg shadow-accent/20"
+                    : recommended
+                    ? "ring-1 ring-accent/40"
+                    : "")
                 }
               >
                 <span
@@ -108,7 +138,7 @@ export default function SongScreen({ id }) {
                 <span className="flex-1">
                   <span className="block font-semibold">
                     {lvl.name}
-                    {recommended && (
+                    {recommended && !isSelected && (
                       <span className="ml-2 rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
                         дальше
                       </span>
@@ -121,7 +151,7 @@ export default function SongScreen({ id }) {
                     {score}%
                   </span>
                 )}
-              </Link>
+              </button>
             </motion.div>
           );
         })}
@@ -189,9 +219,20 @@ export default function SongScreen({ id }) {
         </motion.pre>
       )}
 
+      {/* В выучено */}
+      <button
+        onClick={toggleLearned}
+        className={
+          "mt-4 w-full rounded-xl2 py-3.5 font-semibold active:scale-[0.98] transition-all " +
+          (learned ? "bg-good/15 text-good" : "glass")
+        }
+      >
+        {learned ? "🏆 В выучено ✓" : "Добавить в выучено"}
+      </button>
+
       {/* Удаление */}
       {confirmDelete ? (
-        <div className="mt-6 flex gap-2">
+        <div className="mt-3 flex gap-2">
           <button
             onClick={doDelete}
             className="flex-1 rounded-xl2 bg-bad/10 py-3 font-semibold text-bad"
@@ -208,11 +249,36 @@ export default function SongScreen({ id }) {
       ) : (
         <button
           onClick={() => setConfirmDelete(true)}
-          className="mt-6 w-full py-2 text-sm text-sub"
+          className="mt-3 w-full py-2 text-sm text-sub"
         >
           Убрать из библиотеки
         </button>
       )}
+
+      {/* Кнопка «Начать» при выбранном уровне */}
+      <AnimatePresence>
+        {selected !== null && (
+          <motion.div
+            initial={{ y: 120, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 120, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 28 }}
+            className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-lg px-4 pb-[max(env(safe-area-inset-bottom),1rem)]"
+          >
+            <div className="glass rounded-xl3 p-4 shadow-2xl shadow-black/10">
+              <button
+                onClick={() =>
+                  router.push(`/train/${id}?mode=cloze&level=${selected}`)
+                }
+                className="w-full rounded-2xl btn-gradient py-3.5 text-base font-semibold active:scale-95 transition-transform"
+              >
+                Начать ·{" "}
+                {CLOZE_LEVELS.find((l) => l.level === selected)?.name}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
