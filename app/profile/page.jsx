@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import { getStats, listLearnedSongs } from "@/lib/storage";
+import { getStats, listLearnedSongs, ADMIN_EMAILS } from "@/lib/storage";
 import { getUser, signOut, supabaseEnabled } from "@/lib/supabase";
 import { toggleSound, soundEnabled } from "@/lib/feedback";
 
@@ -184,6 +184,15 @@ export default function ProfilePage() {
             </Link>
           )}
         </div>
+      )}
+
+      {user && ADMIN_EMAILS.includes(user.email) && (
+        <Link
+          href="/admin"
+          className="glass mt-4 block rounded-xl2 p-4 text-center font-semibold active:scale-[0.99] transition-transform"
+        >
+          🛠 Массовая загрузка песен
+        </Link>
       )}
 
       <p className="mt-8 text-center text-xs text-sub">
