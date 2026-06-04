@@ -13,6 +13,7 @@ import {
   migrateGuestData,
   searchSongs,
   addToLibrary,
+  listBaseSongs,
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
 import WaveLine, { roman } from "@/components/Decor";
@@ -29,9 +30,12 @@ export default function HomePage() {
   const [theme, setTheme] = useState("light");
   const [baseResults, setBaseResults] = useState(null); // поиск по общей базе
   const [searching, setSearching] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [suggest, setSuggest] = useState([]); // подсказки из базы новичку
 
-  useEffect(() => {
-    (async () => {
+  async function loadAll() {
+    setLoadError(false);
+    try {
       // если гость только что вошёл — перенести его данные в облако
       const u0 = await getUser();
       if (u0) {
@@ -64,7 +68,24 @@ export default function HomePage() {
         })
       );
       setMastery(m);
-    })();
+
+      // новичку с пустым (или почти) репертуаром — подсказки из общей базы
+      if (u && s.length < 3) {
+        try {
+          const base = await listBaseSongs(8);
+          const mine = new Set(s.map((x) => x.id));
+          setSuggest(base.filter((x) => !mine.has(x.id)).slice(0, 5));
+        } catch {}
+      }
+    } catch (e) {
+      setLoadError(true);
+      setSongs([]);
+    }
+  }
+
+  useEffect(() => {
+    loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = (songs || []).filter((s) => {
@@ -94,8 +115,12 @@ export default function HomePage() {
 
   async function addFromBase(id) {
     await addToLibrary(id);
-    const fresh = await listMySongs();
+    let fresh = [];
+    try {
+      fresh = await listMySongs();
+    } catch {}
     setSongs(fresh);
+    setSuggest((list) => list.filter((s) => s.id !== id));
     setQuery("");
     setBaseResults(null);
   }
@@ -232,6 +257,24 @@ export default function HomePage() {
         </motion.section>
       )}
 
+      {/* Ошибка загрузки */}
+      {loadError && (
+        <div className="glass mb-6 rounded-xl2 p-5 text-center">
+          <p className="mb-2 font-serif text-lg font-bold">
+            Не удалось загрузить песенник
+          </p>
+          <p className="mb-3 text-sm text-sub">
+            Проверь интернет и попробуй ещё раз
+          </p>
+          <button
+            onClick={loadAll}
+            className="btn-gradient rounded-xl2 px-6 py-2.5 text-sm font-semibold active:scale-95 transition-transform"
+          >
+            Повторить
+          </button>
+        </div>
+      )}
+
       {/* Репертуар */}
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="font-serif text-2xl font-bold">Мой репертуар</h2>
@@ -345,6 +388,39 @@ export default function HomePage() {
               </Link>
             </motion.div>
           ))}
+        </div>
+      )}
+
+      {/* Подсказки новичку из общей базы */}
+      {user && suggest.length > 0 && !query && (
+        <div className="mt-6">
+          <div className="mb-3 flex items-center gap-3">
+            <h2 className="font-serif text-xl font-bold">Из общей базы</h2>
+            <span className="rule flex-1" />
+          </div>
+          <div className="space-y-2">
+            {suggest.map((s) => (
+              <div
+                key={s.id}
+                className="glass flex items-center gap-3 rounded-xl2 p-3 pl-4"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="kicker block truncate !text-[10px]">
+                    {s.artist || "Без исполнителя"}
+                  </span>
+                  <span className="block truncate font-serif text-[15px] font-bold">
+                    {s.title}
+                  </span>
+                </span>
+                <button
+                  onClick={() => addFromBase(s.id)}
+                  className="shrink-0 rounded-xl border border-accent bg-accent px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
+                >
+                  + себе
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

@@ -29,6 +29,7 @@ export default function SongScreen({ id }) {
   const [selected, setSelected] = useState(null); // выбранный уровень
   const [learned, setLearnedState] = useState(false);
   const [plan, setPlan] = useState("pro"); // чтобы замки не мигали у Pro
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -41,6 +42,7 @@ export default function SongScreen({ id }) {
       setProgress(p);
       setPlan(pl);
       setLearnedState(Boolean(p?.learned));
+      if (!s) setFailed(true);
     })();
   }, [id]);
 
@@ -48,9 +50,26 @@ export default function SongScreen({ id }) {
     return (
       <main>
         <Header title="Песня" />
-        <div className="glass animate-pulse rounded-xl3 p-10 text-center text-sub">
-          Загрузка…
-        </div>
+        {failed ? (
+          <div className="glass rounded-xl3 p-8 text-center">
+            <p className="mb-2 font-serif text-lg font-bold">
+              Песня не загрузилась
+            </p>
+            <p className="mb-4 text-sm text-sub">
+              Нет связи или песня была убрана
+            </p>
+            <button
+              onClick={() => location.reload()}
+              className="btn-gradient rounded-xl2 px-6 py-2.5 text-sm font-semibold"
+            >
+              Повторить
+            </button>
+          </div>
+        ) : (
+          <div className="glass animate-pulse rounded-xl3 p-10 text-center text-sub">
+            Загрузка…
+          </div>
+        )}
       </main>
     );
   }
