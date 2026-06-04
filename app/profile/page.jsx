@@ -231,6 +231,26 @@ export default function ProfilePage() {
         </Link>
       )}
 
+      <button
+        onClick={async () => {
+          const data = {
+            title: "Запевай",
+            text: "Я учу песни наизусть в «Запевай» — присоединяйся!",
+            url: "https://zapevai.vercel.app",
+          };
+          try {
+            if (navigator.share) await navigator.share(data);
+            else {
+              await navigator.clipboard.writeText(data.text + " " + data.url);
+              alert("Ссылка скопирована — отправь друзьям!");
+            }
+          } catch {}
+        }}
+        className="btn-gradient mt-4 w-full rounded-xl2 py-3.5 font-semibold active:scale-[0.98] transition-transform"
+      >
+        🎤 Позвать друзей
+      </button>
+
       <p className="mt-8 text-center text-xs text-sub">
         Запевай · учи песни с удовольствием
       </p>

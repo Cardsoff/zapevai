@@ -1,0 +1,13 @@
+{
+  "name": "Запевай — тренажёр текстов песен",
+  "short_name": "Запевай",
+  "description": "Выучи любую песню наизусть: тренировки, уровни и умные повторения",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f1e7",
+  "theme_color": "#f6f1e7",
+  "lang": "ru",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

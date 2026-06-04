@@ -14,6 +14,21 @@ export const metadata = {
   title: "Запевай — тренажёр текстов песен",
   description:
     "Выучи любую песню наизусть: интерактивные тренировки, уровни сложности и умные повторения.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Запевай",
+    statusBarStyle: "default",
+  },
+  openGraph: {
+    title: "Запевай — выучи любую песню наизусть",
+    description:
+      "Интерактивные тренировки, уровни сложности и умные повторения. Бесплатно.",
+    url: "https://zapevai.vercel.app",
+    siteName: "Запевай",
+    locale: "ru_RU",
+    type: "website",
+  },
 };
 
 export const viewport = {

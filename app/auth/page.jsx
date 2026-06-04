@@ -14,6 +14,19 @@ import {
   supabaseEnabled,
 } from "@/lib/supabase";
 
+// Перевод типовых ошибок Supabase
+function ruError(msg) {
+  const m = (msg || "").toLowerCase();
+  if (m.includes("invalid login credentials")) return "Неверная почта или пароль";
+  if (m.includes("email not confirmed")) return "Почта не подтверждена — найди письмо от «Запевай»";
+  if (m.includes("already registered")) return "Такой аккаунт уже есть — попробуй войти";
+  if (m.includes("rate limit") || m.includes("too many")) return "Слишком много попыток — подожди пару минут";
+  if (m.includes("password should be")) return "Пароль слишком короткий — минимум 6 символов";
+  if (m.includes("invalid email") || m.includes("unable to validate")) return "Похоже, в почте опечатка";
+  if (m.includes("fetch") || m.includes("network")) return "Нет связи — проверь интернет";
+  return msg || "Что-то пошло не так";
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState("signin"); // signin | signup | forgot
@@ -54,7 +67,7 @@ export default function AuthPage() {
       setBusy(false);
       setMsg(
         error
-          ? error.message || "Что-то пошло не так"
+          ? ruError(error.message)
           : "Письмо со ссылкой для смены пароля отправлено — проверь почту."
       );
       return;
@@ -63,7 +76,7 @@ export default function AuthPage() {
     const { error } = await fn(email.trim(), password);
     setBusy(false);
     if (error) {
-      setMsg(error.message || "Что-то пошло не так");
+      setMsg(ruError(error.message));
     } else if (mode === "signup") {
       setMsg("Готово! Проверь почту и подтверди адрес.");
     } else {

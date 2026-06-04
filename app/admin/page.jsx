@@ -91,6 +91,11 @@ export default function AdminPage() {
 
   async function togglePlan(u) {
     const next = u.plan === "pro" ? "free" : "pro";
+    if (
+      next === "free" &&
+      !window.confirm(`Снять Про у ${u.email}? Останется 1 песня без удаления.`)
+    )
+      return;
     setUsers((list) =>
       list.map((x) => (x.user_id === u.user_id ? { ...x, plan: next } : x))
     );
