@@ -15,6 +15,32 @@
   --glow-opacity: 0.18;
 }
 
+/* ---- Темы: тёмная (тёплая бумага ночью) и чёрная (AMOLED) ---- */
+[data-theme="dark"] {
+  --ink: #ece4d4;
+  --sub: #a3957f;
+  --bg: #1c1713;
+  --card: rgba(42, 35, 27, 0.92);
+  --line: rgba(236, 228, 212, 0.13);
+  --wine: #c4707c;
+  --gold: #d4a94e;
+  --good: #8fbf72;
+  --bad: #e07070;
+  --glow-opacity: 0.13;
+}
+[data-theme="black"] {
+  --ink: #e8e2d6;
+  --sub: #94897a;
+  --bg: #0a0908;
+  --card: rgba(24, 21, 17, 0.96);
+  --line: rgba(232, 226, 214, 0.1);
+  --wine: #c4707c;
+  --gold: #d4a94e;
+  --good: #8fbf72;
+  --bad: #e07070;
+  --glow-opacity: 0.09;
+}
+
 html,
 body {
   background: var(--bg);

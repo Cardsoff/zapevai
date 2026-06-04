@@ -28,6 +28,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ru" className={`${display.variable} ${body.variable}`}>
       <body className="min-h-screen font-sans">
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('zp_theme');if(t&&t!=='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}",
+          }}
+        />
         <div className="aurora" id="aurora">
           <div className="third" />
         </div>

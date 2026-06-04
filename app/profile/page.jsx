@@ -15,13 +15,29 @@ export default function ProfilePage() {
   const [learned, setLearned] = useState(null);
   const [user, setUser] = useState(null);
   const [sound, setSound] = useState(true);
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
     getStats().then(setStats);
     listLearnedSongs().then(setLearned);
     getUser().then(setUser);
     setSound(soundEnabled());
+    try {
+      setTheme(localStorage.getItem("zp_theme") || "light");
+    } catch {}
   }, []);
+
+  function applyTheme(t) {
+    setTheme(t);
+    try {
+      localStorage.setItem("zp_theme", t);
+    } catch {}
+    if (t === "light") {
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      document.documentElement.setAttribute("data-theme", t);
+    }
+  }
 
   return (
     <main className="pb-safe">
@@ -85,6 +101,30 @@ export default function ProfilePage() {
         <h2 className="font-serif text-xl font-bold">Настройки</h2>
         <span className="rule flex-1" />
       </div>
+      <div className="glass mb-3 rounded-xl2 p-4">
+        <p className="mb-3 font-semibold">Тема</p>
+        <div className="flex gap-2">
+          {[
+            { id: "light", name: "Бумага" },
+            { id: "dark", name: "Тёмная" },
+            { id: "black", name: "Чёрная" },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => applyTheme(t.id)}
+              className={
+                "flex-1 rounded-xl2 border py-2.5 text-sm font-semibold transition-all " +
+                (theme === t.id
+                  ? "border-accent bg-accent text-white"
+                  : "border-line bg-card")
+              }
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <button
         onClick={() => setSound(toggleSound())}
         className="glass mb-6 flex w-full items-center justify-between rounded-xl2 p-4 active:scale-[0.99] transition-transform"
