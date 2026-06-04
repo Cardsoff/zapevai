@@ -37,6 +37,11 @@ export default function Landing({ onTry }) {
     }
     timers.current.forEach(clearTimeout);
     timers.current = [];
+    if (cur === 0) {
+      setFog({});
+      timers.current.push(setTimeout(() => setFog((f) => ({ ...f, 0: true })), 1100));
+      timers.current.push(setTimeout(() => setFog((f) => ({ ...f, 1: true })), 1900));
+    }
     if (cur === 1) {
       setGaps({});
       [0, 1, 2, 3].forEach((k) => {
@@ -176,8 +181,8 @@ export default function Landing({ onTry }) {
             </span>
           </h1>
           <p className="sub anim d3">
-            Бесплатно, без регистрации. Прячем слова — ты достаёшь их из памяти.
-            Тапни на туман, чтобы открыть.
+            Бесплатно, без регистрации. Прячем слова — а ты достаёшь их из
+            памяти. Смотри, как открывается туман.
           </p>
           <svg className="hero-wave anim d4" viewBox="0 0 240 42">
             <path d="M2,21 Q22,2 42,21 T82,21 T122,21 T162,21 T202,21 T238,21" />
