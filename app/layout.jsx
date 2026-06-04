@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Playfair_Display, Golos_Text } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 
 const display = Playfair_Display({
   subsets: ["cyrillic", "latin"],
@@ -53,6 +54,7 @@ export default function RootLayout({ children }) {
           <div className="third" />
         </div>
         <div className="mx-auto max-w-lg px-4">{children}</div>
+        <Analytics />
       </body>
     </html>
   );
