@@ -31,6 +31,7 @@ export default function HomePage() {
   const [baseResults, setBaseResults] = useState(null); // поиск по общей базе
   const [searching, setSearching] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [suggest, setSuggest] = useState([]);
 
   async function loadAll() {
     setLoadError(false);
@@ -74,6 +75,15 @@ export default function HomePage() {
       );
       setMastery(m);
 
+      if (s.length < 3) {
+        try {
+          const base = await listBaseSongs(20);
+          const mine = new Set(s.map((x) => x.id));
+          setSuggest(base.filter((x) => !mine.has(x.id)).slice(0, 5));
+        } catch {}
+      } else {
+        setSuggest([]);
+      }
     } catch (e) {
       setLoadError(true);
       setSongs([]);
@@ -117,6 +127,7 @@ export default function HomePage() {
       fresh = await listMySongs();
     } catch {}
     setSongs(fresh);
+    setSuggest((list) => list.filter((s) => s.id !== id));
     setQuery("");
     setBaseResults(null);
   }
@@ -151,6 +162,7 @@ export default function HomePage() {
     <main className="pb-safe pt-[max(env(safe-area-inset-top),1.5rem)]">
       {/* Журнальная шапка */}
       <div className="mb-1 flex items-center gap-3">
+        <span className="w-[72px] shrink-0" />
         <span className="rule flex-1" />
         <p className="kicker">
           Песенник
@@ -159,20 +171,22 @@ export default function HomePage() {
             : ""}
         </p>
         <span className="rule flex-1" />
-        <button
-          onClick={cycleTheme}
-          aria-label="Сменить тему"
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
-        >
-          {theme === "light" ? "☀" : theme === "dark" ? "☾" : "●"}
-        </button>
-        <Link
-          href="/profile"
-          aria-label="Профиль"
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
-        >
-          {user ? "✓" : "○"}
-        </Link>
+        <span className="flex w-[72px] shrink-0 justify-end gap-2">
+          <button
+            onClick={cycleTheme}
+            aria-label="Сменить тему"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
+          >
+            {theme === "light" ? "☀" : theme === "dark" ? "☾" : "●"}
+          </button>
+          <Link
+            href="/profile"
+            aria-label="Профиль"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
+          >
+            {user ? "✓" : "○"}
+          </Link>
+        </span>
       </div>
 
       <motion.div
@@ -387,6 +401,48 @@ export default function HomePage() {
               </Link>
             </motion.div>
           ))}
+        </div>
+      )}
+
+      {/* Случайные песни из общей базы для новичков */}
+      {suggest.length > 0 && !query && !loadError && (
+        <div className="mt-6">
+          <div className="mb-3 flex items-center gap-3">
+            <h2 className="font-serif text-xl font-bold">Попробуй из общей базы</h2>
+            <span className="rule flex-1" />
+          </div>
+          <div className="space-y-2">
+            {suggest.map((s) => (
+              <div
+                key={s.id}
+                className="glass flex items-center gap-3 rounded-xl2 p-3 pl-4"
+              >
+                <Link href={`/song/${s.id}`} className="min-w-0 flex-1">
+                  <span className="kicker block truncate !text-[10px]">
+                    {s.artist || "Без исполнителя"}
+                  </span>
+                  <span className="block truncate font-serif text-[15px] font-bold">
+                    {s.title}
+                  </span>
+                </Link>
+                {user ? (
+                  <button
+                    onClick={() => addFromBase(s.id)}
+                    className="shrink-0 rounded-xl border border-accent bg-accentDeep px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
+                  >
+                    + себе
+                  </button>
+                ) : (
+                  <Link
+                    href={`/song/${s.id}`}
+                    className="shrink-0 rounded-xl border border-line bg-card px-3 py-1.5 text-xs font-semibold"
+                  >
+                    Учить
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
