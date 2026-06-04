@@ -17,6 +17,7 @@ create table if not exists public.user_songs (
   user_id uuid references auth.users (id) on delete cascade,
   song_id uuid references public.songs (id) on delete cascade,
   added_at timestamptz default now(),
+  learned boolean not null default false,
   primary key (user_id, song_id)
 );
 
