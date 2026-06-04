@@ -11,12 +11,12 @@ export default function Header({ title, back = true, right = null }) {
           <button
             onClick={() => router.back()}
             aria-label="Назад"
-            className="flex h-9 w-9 items-center justify-center rounded-full glass text-lg active:scale-90 transition-transform"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-card text-lg active:scale-90 transition-transform"
           >
             ‹
           </button>
         )}
-        <h1 className="flex-1 truncate font-serif text-xl font-semibold">{title}</h1>
+        <h1 className="flex-1 truncate font-serif text-xl font-bold">{title}</h1>
         {right}
       </div>
     </header>

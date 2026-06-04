@@ -127,18 +127,62 @@ body {
   color: #fdf9f0;
 }
 
-/* скрытое слово */
+/* скрытое слово — чернильная плашка-подчёркивание */
 .blank {
   display: inline-block;
-  border-radius: 0.6em;
-  background: var(--line);
+  border-radius: 3px 3px 0 0;
+  background: rgba(42, 33, 24, 0.06);
+  border-bottom: 2px solid color-mix(in srgb, var(--wine) 45%, transparent);
   color: transparent;
   user-select: none;
   cursor: pointer;
   transition: background 0.25s ease;
 }
 .blank:active {
-  background: rgba(114, 47, 55, 0.3);
+  background: rgba(114, 47, 55, 0.25);
+}
+
+/* ---- Эдиториал ---- */
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sub);
+  font-weight: 600;
+}
+.spine {
+  position: relative;
+  overflow: hidden;
+}
+.spine::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--wine), var(--gold));
+}
+.bar {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--line);
+  overflow: hidden;
+}
+.bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--wine), var(--gold));
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn-ink {
+  background: var(--ink);
+  color: var(--bg);
+}
+.rule {
+  height: 1px;
+  background: var(--line);
 }
 
 input,

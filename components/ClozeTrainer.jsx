@@ -45,7 +45,7 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
         {parsed.sections.map((sec, si) => (
           <div key={si} className="glass rounded-xl3 p-5">
             {sec.lines.map((line, li) => (
-              <p key={li} className="mb-1.5 text-[17px] leading-relaxed">
+              <p key={li} className="mb-2 font-serif text-[17px] leading-relaxed">
                 {line.tokens.map((t, ti) => {
                   if (t.type === "sep") return <span key={ti}>{t.text}</span>;
                   if (!hidden.has(t.i)) return <span key={ti}>{t.text}</span>;
@@ -67,7 +67,7 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
                       initial={{ opacity: 0, filter: "blur(6px)", scale: 0.9 }}
                       animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
                       transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                      className="inline-block rounded-md px-0.5 font-medium text-bad"
+                      className="inline-block rounded-md px-0.5 font-semibold italic text-accent"
                     >
                       {t.text}
                     </motion.span>
@@ -86,9 +86,9 @@ export default function ClozeTrainer({ lyrics, level, onFinish }) {
       {/* Нижняя панель: счётчик + «Готово» */}
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-lg px-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
         <div className="glass rounded-xl3 p-4 shadow-2xl shadow-black/10">
-          <p className="mb-3 text-center text-sm text-sub">
+          <p className="mb-3 text-center font-serif text-sm italic text-sub">
             Открыто:{" "}
-            <span className="font-semibold text-ink tabular-nums">
+            <span className="font-bold not-italic text-ink tabular-nums">
               {opened} из {total}
             </span>{" "}
             скрытых

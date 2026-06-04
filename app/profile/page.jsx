@@ -34,7 +34,7 @@ export default function ProfilePage() {
         ].map((s) => (
           <div key={s.l} className="glass rounded-xl2 p-4 text-center">
             <p className="text-lg">{s.e}</p>
-            <p className="text-2xl font-bold tabular-nums">{s.v}</p>
+            <p className="font-serif text-3xl font-bold italic text-accent tabular-nums">{s.v}</p>
             <p className="text-xs text-sub">{s.l}</p>
           </div>
         ))}

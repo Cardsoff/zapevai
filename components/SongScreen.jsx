@@ -16,6 +16,7 @@ import {
 } from "@/lib/storage";
 import { CLOZE_LEVELS } from "@/lib/lyrics";
 import { isDue } from "@/lib/srs";
+import { roman } from "@/components/Decor";
 import { goodFeedback, tapFeedback } from "@/lib/feedback";
 
 export default function SongScreen({ id }) {
@@ -84,10 +85,10 @@ export default function SongScreen({ id }) {
       >
         <ProgressRing value={mastery} size={72} stroke={6} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-bold">{song.title}</p>
-          <p className="truncate text-sm text-sub">
+          <p className="kicker truncate !text-[10px]">
             {song.artist || "Без исполнителя"}
           </p>
+          <p className="truncate font-serif text-xl font-bold">{song.title}</p>
           {learned && (
             <p className="mt-1 text-xs font-semibold text-good">🏆 Выучено</p>
           )}
@@ -100,9 +101,10 @@ export default function SongScreen({ id }) {
       </motion.div>
 
       {/* Пропуски слов — 5 уровней */}
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-sub">
-        Пропуски слов
-      </h2>
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="font-serif text-xl font-bold">Пропуски слов</h2>
+        <span className="rule flex-1" />
+      </div>
       <div className="mb-6 space-y-2">
         {CLOZE_LEVELS.map((lvl, i) => {
           const score = progress?.cloze?.[lvl.level] || 0;
@@ -133,7 +135,13 @@ export default function SongScreen({ id }) {
                     (passed ? "bg-good/15 text-good" : "glass")
                   }
                 >
-                  {passed ? "✓" : lvl.level}
+                  {passed ? (
+                    "✓"
+                  ) : (
+                    <span className="font-serif italic">
+                      {roman(lvl.level).toUpperCase()}
+                    </span>
+                  )}
                 </span>
                 <span className="flex-1">
                   <span className="block font-semibold">
@@ -147,8 +155,8 @@ export default function SongScreen({ id }) {
                   <span className="block text-xs text-sub">{lvl.desc}</span>
                 </span>
                 {score > 0 && (
-                  <span className="text-sm font-semibold tabular-nums text-sub">
-                    {score}%
+                  <span className="font-serif text-base italic text-accent tabular-nums">
+                    {score}<span className="text-xs">%</span>
                   </span>
                 )}
               </button>
@@ -158,9 +166,10 @@ export default function SongScreen({ id }) {
       </div>
 
       {/* Другие режимы */}
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-sub">
-        Другие режимы
-      </h2>
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="font-serif text-xl font-bold">Другие режимы</h2>
+        <span className="rule flex-1" />
+      </div>
       <div className="mb-6 space-y-2">
         <Link
           href={`/train/${id}?mode=letters`}
@@ -176,8 +185,8 @@ export default function SongScreen({ id }) {
             </span>
           </span>
           {(progress?.letters || 0) > 0 && (
-            <span className="text-sm font-semibold text-sub">
-              {progress.letters}%
+            <span className="font-serif text-base italic text-accent">
+              {progress.letters}<span className="text-xs">%</span>
             </span>
           )}
         </Link>
@@ -195,8 +204,8 @@ export default function SongScreen({ id }) {
             </span>
           </span>
           {(progress?.relay || 0) > 0 && (
-            <span className="text-sm font-semibold text-sub">
-              {progress.relay}%
+            <span className="font-serif text-base italic text-accent">
+              {progress.relay}<span className="text-xs">%</span>
             </span>
           )}
         </Link>
@@ -213,7 +222,7 @@ export default function SongScreen({ id }) {
         <motion.pre
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="glass mb-4 whitespace-pre-wrap rounded-xl2 p-5 font-sans text-[15px] leading-relaxed"
+          className="glass mb-4 whitespace-pre-wrap rounded-xl2 p-5 font-serif text-[16px] leading-relaxed"
         >
           {song.lyrics}
         </motion.pre>

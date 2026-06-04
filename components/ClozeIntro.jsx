@@ -27,21 +27,21 @@ export default function ClozeIntro({ onStart }) {
       animate={{ opacity: 1, y: 0 }}
       className="glass rounded-xl3 p-6"
     >
-      <h2 className="mb-4 text-xl font-bold">Как тренироваться</h2>
+      <h2 className="mb-4 font-serif text-2xl font-bold">Как тренироваться</h2>
       <ol className="mb-5 space-y-3 text-[15px] leading-relaxed">
         <li className="flex gap-3">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full glass text-sm font-bold">1</span>
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line bg-card font-serif text-sm font-bold italic">i</span>
           <span>Читай текст и вспоминай скрытые слова про себя.</span>
         </li>
         <li className="flex gap-3">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full glass text-sm font-bold">2</span>
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line bg-card font-serif text-sm font-bold italic">ii</span>
           <span>
             Вспомнил слово — <b>не трогай его</b>. Забыл — коснись, и оно
             откроется.
           </span>
         </li>
         <li className="flex gap-3">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full glass text-sm font-bold">3</span>
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line bg-card font-serif text-sm font-bold italic">iii</span>
           <span>
             В конце нажми «Готово» — результат посчитается сам: открытые слова
             идут как «забыл», остальные как «вспомнил».

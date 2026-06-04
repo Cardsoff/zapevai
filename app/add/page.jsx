@@ -131,7 +131,7 @@ export default function AddSongPage() {
             "Вставь текст песни…\n\nКуплеты разделяй пустой строкой — так тренировки будут удобнее."
           }
           rows={12}
-          className="glass w-full resize-none rounded-xl2 px-4 py-3.5 text-[16px] leading-relaxed"
+          className="glass w-full resize-none rounded-xl2 px-4 py-3.5 font-serif text-[16px] leading-relaxed"
         />
         <p className="px-1 text-right text-xs text-sub">
           {words > 0 ? `${words} слов` : "минимум 10 слов"}

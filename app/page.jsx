@@ -1,6 +1,6 @@
 "use client";
 
-// Главный экран: библиотека, блок «Пора повторить», серия дней
+// Главный экран — «песенник»: журнальная шапка, серия, повторения, репертуар
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -12,7 +12,7 @@ import {
   songMastery,
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
-import ProgressRing from "@/components/ProgressRing";
+import WaveLine, { roman } from "@/components/Decor";
 
 export default function HomePage() {
   const [songs, setSongs] = useState(null);
@@ -53,72 +53,116 @@ export default function HomePage() {
     );
   });
 
+  const firstDue = due[0];
+
   return (
-    <main className="pb-safe pt-[max(env(safe-area-inset-top),1.25rem)]">
-      {/* Шапка */}
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-[34px] font-bold tracking-tight">
-          <span className="text-gradient">Запевай</span>
-        </h1>
-        <div className="flex items-center gap-2">
-          {stats.streak > 0 && (
-            <span className="glass rounded-full px-3 py-1.5 text-sm font-semibold">
-              🔥 {stats.streak}
-            </span>
-          )}
-          <Link
-            href="/profile"
-            aria-label="Профиль"
-            className="flex h-9 w-9 items-center justify-center rounded-full glass text-base"
-          >
-            {user ? "👤" : "○"}
-          </Link>
-        </div>
+    <main className="pb-safe pt-[max(env(safe-area-inset-top),1.5rem)]">
+      {/* Журнальная шапка */}
+      <div className="mb-1 flex items-center gap-3">
+        <span className="rule flex-1" />
+        <p className="kicker">
+          Песенник{songs ? ` · ${songs.length || "—"} ${plural(songs.length)}` : ""}
+        </p>
+        <span className="rule flex-1" />
+        <Link
+          href="/profile"
+          aria-label="Профиль"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
+        >
+          {user ? "✓" : "○"}
+        </Link>
       </div>
 
-      {/* Пора повторить */}
-      {due.length > 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
-        >
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-sub">
-            Пора повторить
-          </h2>
-          <div className="space-y-2">
-            {due.map((s) => (
-              <Link
-                key={s.id}
-                href={`/song/${s.id}`}
-                className="glass flex items-center gap-3 rounded-xl2 border-l-4 !border-l-accent p-4 active:scale-[0.98] transition-transform"
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-2 text-center"
+      >
+        <h1 className="font-serif text-[44px] font-bold leading-tight tracking-tight">
+          Запе<span className="italic text-accent">вай</span>
+        </h1>
+        <p className="font-serif text-[13px] italic text-sub">
+          — и пусть слова никогда не забываются
+        </p>
+      </motion.div>
+
+      <WaveLine className="mb-6 mt-3" />
+
+      {/* Серия дней */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="glass mb-4 flex items-center gap-4 rounded-xl2 p-4"
+      >
+        <span className="font-serif text-4xl font-bold italic text-accent tabular-nums">
+          {stats.streak}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] font-semibold">
+            {stats.streak > 0 ? "дней подряд вы поёте" : "начни серию сегодня"}
+          </p>
+          <div className="mt-2 flex gap-1.5">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <span
+                key={i}
+                className={
+                  "flex h-5 w-5 items-center justify-center rounded-full text-[10px] " +
+                  (i < Math.min(stats.streak, 7)
+                    ? "bg-accent text-white"
+                    : "border border-dashed border-line text-transparent")
+                }
               >
-                <span className="text-xl">⏰</span>
-                <span className="flex-1">
-                  <span className="block font-semibold">{s.title}</span>
-                  <span className="block text-sm text-sub">{s.artist}</span>
-                </span>
-                <span className="text-sub">›</span>
-              </Link>
+                ✓
+              </span>
             ))}
           </div>
+        </div>
+      </motion.div>
+
+      {/* Пора повторить */}
+      {firstDue && (
+        <motion.section
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6 rounded-xl2 bg-accent p-5 text-[#fdf6ec]"
+        >
+          <p className="kicker mb-2 !text-accent2">Пора повторить</p>
+          <p className="font-serif text-xl font-bold leading-snug">
+            «{firstDue.title}» <span className="italic font-medium">ждёт вас</span>
+          </p>
+          <p className="mt-1 text-[13px] opacity-80">
+            Память начинает таять — повтори, пока слова тёплые.
+            {due.length > 1 ? ` И ещё ${due.length - 1} в очереди.` : ""}
+          </p>
+          <Link
+            href={`/song/${firstDue.id}`}
+            className="mt-3 inline-block border-b border-current pb-0.5 text-sm font-semibold"
+          >
+            Повторить сейчас →
+          </Link>
         </motion.section>
       )}
 
-      {/* Поиск */}
+      {/* Репертуар */}
+      <div className="mb-3 flex items-baseline justify-between">
+        <h2 className="font-serif text-2xl font-bold">Мой репертуар</h2>
+        {songs && songs.length > 0 && (
+          <span className="font-serif text-sm italic text-sub">
+            {songs.length} {plural(songs.length)}
+          </span>
+        )}
+      </div>
+
       {songs && songs.length > 3 && (
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Поиск по моим песням"
+          placeholder="Поиск по репертуару"
           className="glass mb-4 w-full rounded-xl2 px-4 py-3 text-[16px]"
         />
       )}
-
-      {/* Библиотека */}
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-sub">
-        Мои песни
-      </h2>
 
       {songs === null ? (
         <div className="glass animate-pulse rounded-xl3 p-10 text-center text-sub">
@@ -130,18 +174,18 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           className="glass rounded-xl3 p-8 text-center"
         >
-          <p className="mb-1 text-4xl">🎤</p>
-          <p className="mb-1 text-lg font-semibold">
-            {query ? "Ничего не найдено" : "Здесь появятся твои песни"}
+          <p className="mb-2 font-serif text-3xl italic text-accent">♪</p>
+          <p className="mb-1 font-serif text-xl font-bold">
+            {query ? "Ничего не найдено" : "Первая страница пуста"}
           </p>
           {!query && (
             <p className="text-sm text-sub">
-              Добавь текст первой песни — и начнём учить
+              Добавь текст песни — и начнём учить
             </p>
           )}
         </motion.div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {filtered.map((s, i) => (
             <motion.div
               key={s.id}
@@ -151,45 +195,63 @@ export default function HomePage() {
             >
               <Link
                 href={`/song/${s.id}`}
-                className="glass flex items-center gap-4 rounded-xl2 p-4 active:scale-[0.98] transition-transform"
+                className="glass spine block rounded-xl2 p-4 pl-5 active:scale-[0.98] transition-transform"
               >
-                <ProgressRing value={mastery[s.id] || 0} size={48} stroke={4} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-semibold">{s.title}</span>
-                  <span className="block truncate text-sm text-sub">
-                    {s.artist || "Без исполнителя"}
+                <div className="flex items-center gap-3">
+                  <span className="w-6 shrink-0 font-serif text-sm italic text-sub">
+                    {roman(i + 1)}
                   </span>
-                </span>
-                <span className="text-sub">›</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="kicker block truncate !text-[10px]">
+                      {s.artist || "Без исполнителя"}
+                    </span>
+                    <span className="block truncate font-serif text-[17px] font-bold leading-snug">
+                      {s.title}
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-serif text-lg italic text-accent tabular-nums">
+                    {mastery[s.id] || 0}
+                    <span className="text-xs">%</span>
+                  </span>
+                </div>
+                <div className="bar ml-9 mt-2.5">
+                  <i style={{ width: `${mastery[s.id] || 0}%` }} />
+                </div>
               </Link>
             </motion.div>
           ))}
         </div>
       )}
 
-      {/* Гостевая подсказка */}
       {!user && songs && songs.length > 0 && (
         <Link
           href="/auth"
-          className="mt-4 block rounded-xl2 border border-dashed border-line p-4 text-center text-sm text-sub"
+          className="mt-4 block rounded-xl2 border border-dashed border-line p-4 text-center font-serif text-sm italic text-sub"
         >
-          Войди, чтобы сохранить песни и прогресс навсегда →
+          Войди, чтобы песенник сохранился навсегда →
         </Link>
       )}
 
-      {/* Кнопка добавления — чернильная пилюля по центру колонки */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-[max(env(safe-area-inset-bottom),1.25rem)] z-20 mx-auto flex w-full max-w-lg justify-center px-4">
+      {/* Кнопка добавления */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-[max(env(safe-area-inset-bottom),1.25rem)] z-20 mx-auto flex w-full max-w-lg justify-end px-4">
         <Link
           href="/add"
           aria-label="Добавить песню"
-          className="pointer-events-auto flex items-center gap-2.5 rounded-full btn-gradient px-7 py-3.5 text-[15px] font-semibold shadow-xl shadow-accent/25 active:scale-95 transition-transform"
+          className="btn-ink pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full shadow-xl shadow-black/25 active:scale-90 transition-transform"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
             <path d="M12 5v14M5 12h14" />
           </svg>
-          Новая песня
         </Link>
       </div>
     </main>
   );
+}
+
+function plural(n) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "песня";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "песни";
+  return "песен";
 }

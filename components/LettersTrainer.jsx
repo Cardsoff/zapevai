@@ -55,7 +55,7 @@ export default function LettersTrainer({ lyrics, onFinish }) {
                   animate={{ opacity: 1, filter: "blur(0px)" }}
                   transition={{ type: "spring", stiffness: 280, damping: 24 }}
                   className={
-                    "mb-1.5 text-[17px] leading-relaxed font-medium " +
+                    "mb-2 font-serif text-[17px] leading-relaxed font-semibold " +
                     (ok === undefined
                       ? "text-accent"
                       : ok
@@ -68,7 +68,7 @@ export default function LettersTrainer({ lyrics, onFinish }) {
               ) : (
                 <p
                   onClick={() => tapLine(idx)}
-                  className="mb-1.5 cursor-pointer text-[17px] leading-relaxed tracking-wide active:opacity-60 transition-opacity"
+                  className="mb-2 cursor-pointer font-serif text-[17px] leading-relaxed tracking-wide active:opacity-60 transition-opacity"
                 >
                   {line.tokens.map((t, ti) =>
                     t.type === "word" ? (
