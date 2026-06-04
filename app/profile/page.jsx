@@ -255,12 +255,7 @@ export default function ProfilePage() {
         🎤 Позвать друзей
       </button>
 
-      {refCode && (
-        <p className="mt-2 text-center text-xs text-sub">
-          Твоя ссылка: zapevai.vercel.app/?ref={refCode} — за приглашённых
-          будут бонусы
-        </p>
-      )}
+      {/* Подпись с реф-ссылкой скрыта до запуска монетизации; шеринг использует её автоматически */}
 
       <p className="mt-8 text-center text-xs text-sub">
         Запевай · учи песни с удовольствием ·{" "}
