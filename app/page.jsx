@@ -13,6 +13,7 @@ import {
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
 import WaveLine, { roman } from "@/components/Decor";
+import Landing from "@/components/Landing";
 
 export default function HomePage() {
   const [songs, setSongs] = useState(null);
@@ -21,6 +22,7 @@ export default function HomePage() {
   const [mastery, setMastery] = useState({});
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
+  const [landing, setLanding] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -34,6 +36,11 @@ export default function HomePage() {
       setDue(d);
       setStats(st);
       setUser(u);
+      try {
+        if (!u && s.length === 0 && !localStorage.getItem("zp_skip_landing")) {
+          setLanding(true);
+        }
+      } catch {}
       const m = {};
       await Promise.all(
         s.map(async (song) => {
@@ -54,6 +61,19 @@ export default function HomePage() {
   });
 
   const firstDue = due[0];
+
+  if (landing) {
+    return (
+      <Landing
+        onTry={() => {
+          try {
+            localStorage.setItem("zp_skip_landing", "1");
+          } catch {}
+          setLanding(false);
+        }}
+      />
+    );
+  }
 
   return (
     <main className="pb-safe pt-[max(env(safe-area-inset-top),1.5rem)]">
