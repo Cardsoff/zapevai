@@ -408,11 +408,12 @@ a:focus-visible {
   pointer-events: none;
 }
 .stories .st-logo em { color: var(--st-wine); font-style: italic; }
-.stories *,
-.stories *:focus,
-.stories *:focus-visible {
+.stories,
+.stories * {
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .stories .stbtn,
 .stories .tabs,

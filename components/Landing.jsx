@@ -122,6 +122,20 @@ export default function Landing({ onTry }) {
       onMouseDown={(e) => onStart(e.clientX, e.clientY)}
       onMouseMove={(e) => onMove(e.clientX, e.clientY)}
       onMouseUp={(e) => onEnd(e.clientX, e.clientY)}
+      onClick={(e) => {
+        if (drag.current.moved) {
+          drag.current.moved = false;
+          return;
+        }
+        if (
+          e.target.closest(
+            ".stbtn, .tab, .fog, .gap, a, button, .bar, .skip"
+          )
+        )
+          return;
+        if (e.clientX < window.innerWidth * 0.38) prev();
+        else next();
+      }}
     >
       <div className="bars">
         {Array.from({ length: N }).map((_, i) => (
@@ -144,15 +158,6 @@ export default function Landing({ onTry }) {
       <button className="skip" onClick={skip}>
         Пропустить
       </button>
-
-      <div
-        className="nav-zone left"
-        onClick={() => !drag.current.moved && prev()}
-      />
-      <div
-        className="nav-zone right"
-        onClick={() => !drag.current.moved && next()}
-      />
 
       <div className="slides">
         {/* 1 HERO */}
