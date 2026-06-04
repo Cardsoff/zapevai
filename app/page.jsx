@@ -177,14 +177,18 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* Кнопка добавления */}
-      <Link
-        href="/add"
-        aria-label="Добавить песню"
-        className="fixed bottom-[max(env(safe-area-inset-bottom),1.25rem)] right-5 z-20 flex h-14 w-14 items-center justify-center rounded-full btn-gradient text-3xl font-light shadow-xl shadow-accent/30 active:scale-90 transition-transform"
-      >
-        +
-      </Link>
+      {/* Кнопка добавления — прижата к колонке контента, а не к краю окна */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-[max(env(safe-area-inset-bottom),1.25rem)] z-20 mx-auto flex w-full max-w-lg justify-end px-4">
+        <Link
+          href="/add"
+          aria-label="Добавить песню"
+          className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full btn-gradient shadow-xl shadow-accent/30 active:scale-90 transition-transform"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </Link>
+      </div>
     </main>
   );
 }
