@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import { getStats, listLearnedSongs, ADMIN_EMAILS } from "@/lib/storage";
+import { getStats, listLearnedSongs, getPlan, ADMIN_EMAILS } from "@/lib/storage";
 import { getUser, signOut, supabaseEnabled } from "@/lib/supabase";
 import { toggleSound, soundEnabled } from "@/lib/feedback";
 
@@ -16,10 +16,12 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [sound, setSound] = useState(true);
   const [theme, setTheme] = useState("light");
+  const [plan, setPlan] = useState(null);
 
   useEffect(() => {
     getStats().then(setStats);
     listLearnedSongs().then(setLearned);
+    getPlan().then(setPlan);
     getUser().then(setUser);
     setSound(soundEnabled());
     try {
@@ -93,6 +95,35 @@ export default function ProfilePage() {
               <span className="text-sub">›</span>
             </Link>
           ))}
+        </div>
+      )}
+
+      {/* Тариф */}
+      {plan && (
+        <div className="glass spine mb-6 rounded-xl2 p-4 pl-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="kicker !text-[10px]">Тариф</p>
+              <p className="font-serif text-xl font-bold">
+                {plan === "pro" ? "Запевай Про" : "Бесплатный"}
+              </p>
+            </div>
+            {plan === "pro" ? (
+              <span className="rounded-full bg-good/15 px-3 py-1 text-xs font-semibold text-good">
+                ✓ активен
+              </span>
+            ) : (
+              <span className="rounded-full border border-line px-3 py-1 text-xs font-semibold text-sub">
+                базовый
+              </span>
+            )}
+          </div>
+          {plan === "free" && (
+            <p className="mt-2 text-xs text-sub">
+              Одна песня и режим «Пропуски». В Про: безлимит песен, все режимы
+              и удаление. Оплата скоро — следи за обновлениями.
+            </p>
+          )}
         </div>
       )}
 

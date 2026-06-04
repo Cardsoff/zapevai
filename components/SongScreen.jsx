@@ -13,6 +13,7 @@ import {
   removeSong,
   setLearned,
   songMastery,
+  getPlan,
 } from "@/lib/storage";
 import { CLOZE_LEVELS } from "@/lib/lyrics";
 import { isDue } from "@/lib/srs";
@@ -27,12 +28,18 @@ export default function SongScreen({ id }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selected, setSelected] = useState(null); // выбранный уровень
   const [learned, setLearnedState] = useState(false);
+  const [plan, setPlan] = useState("pro"); // чтобы замки не мигали у Pro
 
   useEffect(() => {
     (async () => {
-      const [s, p] = await Promise.all([getSong(id), getProgress(id)]);
+      const [s, p, pl] = await Promise.all([
+        getSong(id),
+        getProgress(id),
+        getPlan(),
+      ]);
       setSong(s);
       setProgress(p);
+      setPlan(pl);
       setLearnedState(Boolean(p?.learned));
     })();
   }, [id]);
@@ -171,12 +178,17 @@ export default function SongScreen({ id }) {
         <span className="rule flex-1" />
       </div>
       <div className="mb-6 space-y-2">
+        {plan === "free" && (
+          <p className="mb-1 font-serif text-xs italic text-sub">
+            Эти режимы открываются в «Запевай Про»
+          </p>
+        )}
         <Link
-          href={`/train/${id}?mode=letters`}
+          href={plan === "free" ? "/profile" : `/train/${id}?mode=letters`}
           className="glass flex items-center gap-3 rounded-xl2 p-4 active:scale-[0.98] transition-transform"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full glass text-base">
-            А·
+            {plan === "free" ? "🔒" : "А·"}
           </span>
           <span className="flex-1">
             <span className="block font-semibold">Первые буквы</span>
@@ -191,11 +203,11 @@ export default function SongScreen({ id }) {
           )}
         </Link>
         <Link
-          href={`/train/${id}?mode=relay`}
+          href={plan === "free" ? "/profile" : `/train/${id}?mode=relay`}
           className="glass flex items-center gap-3 rounded-xl2 p-4 active:scale-[0.98] transition-transform"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full glass text-base">
-            ⇄
+            {plan === "free" ? "🔒" : "⇄"}
           </span>
           <span className="flex-1">
             <span className="block font-semibold">Эстафета строк</span>
@@ -240,7 +252,11 @@ export default function SongScreen({ id }) {
       </button>
 
       {/* Удаление */}
-      {confirmDelete ? (
+      {plan === "free" ? (
+        <p className="mt-3 w-full py-2 text-center font-serif text-xs italic text-sub">
+          Удаление песен и безлимит — в «Запевай Про»
+        </p>
+      ) : confirmDelete ? (
         <div className="mt-3 flex gap-2">
           <button
             onClick={doDelete}

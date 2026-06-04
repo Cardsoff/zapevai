@@ -3,7 +3,7 @@
 // Админ-панель: массовая загрузка песен в общую базу
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
-import { isAdmin, adminBulkAddSongs } from "@/lib/storage";
+import { isAdmin, adminBulkAddSongs, adminListUsers, adminSetPlan } from "@/lib/storage";
 import { parseLyrics } from "@/lib/lyrics";
 
 const TEMPLATE = `Название песни — Исполнитель
@@ -45,10 +45,27 @@ export default function AdminPage() {
   const [raw, setRaw] = useState("");
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState(null);
+  const [users, setUsers] = useState(null);
 
   useEffect(() => {
-    isAdmin().then(setAllowed);
+    isAdmin().then((ok) => {
+      setAllowed(ok);
+      if (ok) adminListUsers().then(setUsers);
+    });
   }, []);
+
+  async function togglePlan(u) {
+    const next = u.plan === "pro" ? "free" : "pro";
+    setUsers((list) =>
+      list.map((x) => (x.user_id === u.user_id ? { ...x, plan: next } : x))
+    );
+    const { error } = await adminSetPlan(u.user_id, next);
+    if (error) {
+      setUsers((list) =>
+        list.map((x) => (x.user_id === u.user_id ? { ...x, plan: u.plan } : x))
+      );
+    }
+  }
 
   if (allowed === null) {
     return (
@@ -90,7 +107,62 @@ export default function AdminPage() {
 
   return (
     <main className="pb-safe">
-      <Header title="Массовая загрузка" />
+      <Header title="Админ" />
+
+      {/* Пользователи и тарифы */}
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="font-serif text-xl font-bold">Пользователи</h2>
+        <span className="rule flex-1" />
+        {users && (
+          <span className="font-serif text-sm italic text-sub">
+            {users.length}
+          </span>
+        )}
+      </div>
+      {users === null ? (
+        <div className="glass mb-6 animate-pulse rounded-xl2 p-5 text-center text-sub">
+          Загрузка…
+        </div>
+      ) : (
+        <div className="mb-8 space-y-1.5">
+          {users.map((u) => (
+            <div
+              key={u.user_id}
+              className="glass flex items-center gap-3 rounded-xl2 px-4 py-3"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold">
+                  {u.email || "без почты"}
+                </span>
+                <span
+                  className={
+                    "text-xs font-semibold " +
+                    (u.plan === "pro" ? "text-good" : "text-sub")
+                  }
+                >
+                  {u.plan === "pro" ? "Про" : "Бесплатный"}
+                </span>
+              </span>
+              <button
+                onClick={() => togglePlan(u)}
+                className={
+                  "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all " +
+                  (u.plan === "pro"
+                    ? "border-line bg-card text-sub"
+                    : "border-accent bg-accent text-white")
+                }
+              >
+                {u.plan === "pro" ? "Снять Про" : "Выдать Про"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="font-serif text-xl font-bold">Массовая загрузка</h2>
+        <span className="rule flex-1" />
+      </div>
 
       <div className="glass mb-4 rounded-xl2 p-4 text-sm text-sub">
         <p className="mb-2 font-semibold text-ink">Шаблон</p>

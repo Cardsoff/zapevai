@@ -51,6 +51,13 @@ export default function AddSongPage() {
       setNotice({ type: "error", text: "Не получилось сохранить: " + res.error });
       return;
     }
+    if (res.limit) {
+      setNotice({
+        type: "error",
+        text: "В бесплатном тарифе — одна песня в репертуаре. Безлимит будет в «Запевай Про».",
+      });
+      return;
+    }
     if (res.nameMatch) {
       setNotice({ type: "name", match: res.nameMatch });
       return;
@@ -68,7 +75,15 @@ export default function AddSongPage() {
 
   async function useExisting(id) {
     setBusy(true);
-    await addToLibrary(id);
+    const r = await addToLibrary(id);
+    setBusy(false);
+    if (r?.limit) {
+      setNotice({
+        type: "error",
+        text: "В бесплатном тарифе — одна песня в репертуаре. Безлимит будет в «Запевай Про».",
+      });
+      return;
+    }
     router.push(`/song/${id}`);
   }
 
