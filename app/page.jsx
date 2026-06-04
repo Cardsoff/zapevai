@@ -153,7 +153,10 @@ export default function HomePage() {
       <div className="mb-1 flex items-center gap-3">
         <span className="rule flex-1" />
         <p className="kicker">
-          Песенник{songs ? ` · ${songs.length || "—"} ${plural(songs.length)}` : ""}
+          Песенник
+          {songs && songs.length > 0
+            ? ` · ${songs.length} ${plural(songs.length)}`
+            : ""}
         </p>
         <span className="rule flex-1" />
         <button
