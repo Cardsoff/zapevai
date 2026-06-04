@@ -3,7 +3,14 @@
 // Админ-панель: массовая загрузка песен в общую базу
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
-import { isAdmin, adminBulkAddSongs, adminListUsers, adminSetPlan } from "@/lib/storage";
+import {
+  isAdmin,
+  adminBulkAddSongs,
+  adminListUsers,
+  adminSetPlan,
+  adminStats,
+  adminUserSongs,
+} from "@/lib/storage";
 import { parseLyrics } from "@/lib/lyrics";
 
 const TEMPLATE = `Название песни — Исполнитель
@@ -46,14 +53,41 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState(null);
   const [users, setUsers] = useState(null);
-  const [tab, setTab] = useState("users"); // users | upload
+  const [tab, setTab] = useState("stats"); // stats | users | upload
+  const [stats, setStats] = useState(null);
+  const [expanded, setExpanded] = useState(null); // user_id раскрытой карточки
+  const [userSongs, setUserSongs] = useState({}); // user_id -> песни
 
   useEffect(() => {
     isAdmin().then((ok) => {
       setAllowed(ok);
-      if (ok) adminListUsers().then(setUsers);
+      if (ok) {
+        adminListUsers().then(setUsers);
+        adminStats().then(setStats);
+      }
     });
   }, []);
+
+  async function toggleExpand(u) {
+    if (expanded === u.user_id) {
+      setExpanded(null);
+      return;
+    }
+    setExpanded(u.user_id);
+    if (!userSongs[u.user_id]) {
+      const songs = await adminUserSongs(u.user_id);
+      setUserSongs((m) => ({ ...m, [u.user_id]: songs }));
+    }
+  }
+
+  function fmtDate(d) {
+    if (!d) return "—";
+    return new Date(d).toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
 
   async function togglePlan(u) {
     const next = u.plan === "pro" ? "free" : "pro";
@@ -113,8 +147,9 @@ export default function AdminPage() {
       {/* Вкладки */}
       <div className="mb-5 flex gap-2">
         {[
-          { id: "users", name: "Пользователи" },
-          { id: "upload", name: "Массовая загрузка" },
+          { id: "stats", name: "Статистика" },
+          { id: "users", name: "Люди" },
+          { id: "upload", name: "Загрузка" },
         ].map((t) => (
           <button
             key={t.id}
@@ -130,6 +165,75 @@ export default function AdminPage() {
           </button>
         ))}
       </div>
+
+      {tab === "stats" && (
+        stats === null ? (
+          <div className="glass animate-pulse rounded-xl3 p-10 text-center text-sub">
+            Загрузка…
+          </div>
+        ) : (
+          <>
+            <div className="mb-6 grid grid-cols-2 gap-2">
+              {[
+                { v: stats.total_users, l: "всего регистраций", e: "👥" },
+                { v: stats.active_week, l: "активны за неделю", e: "🔥" },
+                { v: stats.today, l: "сегодня", e: "📅" },
+                { v: stats.week, l: "за 7 дней", e: "📈" },
+                { v: stats.pro_users, l: "с тарифом Про", e: "⭐" },
+                { v: stats.total_songs, l: "песен в базе", e: "🎵" },
+              ].map((c) => (
+                <div key={c.l} className="glass rounded-xl2 p-4">
+                  <p className="text-base">{c.e}</p>
+                  <p className="font-serif text-3xl font-bold italic text-accent tabular-nums">
+                    {c.v}
+                  </p>
+                  <p className="text-xs text-sub">{c.l}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mb-3 flex items-center gap-3">
+              <h2 className="font-serif text-xl font-bold">Регистрации по дням</h2>
+              <span className="rule flex-1" />
+            </div>
+            <div className="glass rounded-xl2 p-4">
+              {(stats.by_day || []).length === 0 ? (
+                <p className="py-4 text-center font-serif text-sm italic text-sub">
+                  Пока нет данных за две недели
+                </p>
+              ) : (
+                <div className="flex items-end gap-1.5" style={{ height: 120 }}>
+                  {stats.by_day.map((d) => {
+                    const max = Math.max(...stats.by_day.map((x) => x.n));
+                    const h = max > 0 ? Math.round((d.n / max) * 96) + 8 : 8;
+                    return (
+                      <div
+                        key={d.day}
+                        className="flex flex-1 flex-col items-center gap-1"
+                      >
+                        <span className="text-[10px] font-semibold tabular-nums text-sub">
+                          {d.n}
+                        </span>
+                        <div
+                          className="w-full rounded-t"
+                          style={{
+                            height: h,
+                            background:
+                              "linear-gradient(180deg, var(--wine), var(--gold))",
+                          }}
+                        />
+                        <span className="text-[9px] text-sub">
+                          {new Date(d.day).getDate()}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </>
+        )
+      )}
 
       {tab === "users" && (
       <>
@@ -148,36 +252,79 @@ export default function AdminPage() {
           Загрузка…
         </div>
       ) : (
-        <div className="mb-8 space-y-1.5">
+        <div className="mb-8 space-y-2">
           {users.map((u) => (
-            <div
-              key={u.user_id}
-              className="glass flex items-center gap-3 rounded-xl2 px-4 py-3"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold">
-                  {u.email || "без почты"}
-                </span>
-                <span
+            <div key={u.user_id} className="glass rounded-xl2 p-4">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => toggleExpand(u)}
+                  className="min-w-0 flex-1 text-left"
+                >
+                  <span className="block truncate text-sm font-semibold">
+                    {u.email || "без почты"}
+                  </span>
+                  <span className="block text-xs text-sub">
+                    рег. {fmtDate(u.created_at)} ·{" "}
+                    {u.songs_count} {u.songs_count === 1 ? "песня" : "песен"} ·{" "}
+                    <span
+                      className={
+                        u.plan === "pro" ? "font-semibold text-good" : ""
+                      }
+                    >
+                      {u.plan === "pro" ? "Про" : "Бесплатный"}
+                    </span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => togglePlan(u)}
                   className={
-                    "text-xs font-semibold " +
-                    (u.plan === "pro" ? "text-good" : "text-sub")
+                    "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all " +
+                    (u.plan === "pro"
+                      ? "border-line bg-card text-sub"
+                      : "border-accent bg-accent text-white")
                   }
                 >
-                  {u.plan === "pro" ? "Про" : "Бесплатный"}
-                </span>
-              </span>
-              <button
-                onClick={() => togglePlan(u)}
-                className={
-                  "shrink-0 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all " +
-                  (u.plan === "pro"
-                    ? "border-line bg-card text-sub"
-                    : "border-accent bg-accent text-white")
-                }
-              >
-                {u.plan === "pro" ? "Снять Про" : "Выдать Про"}
-              </button>
+                  {u.plan === "pro" ? "Снять Про" : "Выдать Про"}
+                </button>
+                <button
+                  onClick={() => toggleExpand(u)}
+                  className="shrink-0 text-sub"
+                  aria-label="Подробнее"
+                >
+                  {expanded === u.user_id ? "▲" : "▼"}
+                </button>
+              </div>
+
+              {expanded === u.user_id && (
+                <div className="mt-3 border-t border-line pt-3">
+                  <p className="mb-1 text-xs text-sub">
+                    Последний вход: {fmtDate(u.last_sign_in_at)}
+                  </p>
+                  <p className="mb-2 kicker !text-[10px]">Песни в библиотеке</p>
+                  {userSongs[u.user_id] === undefined ? (
+                    <p className="text-xs text-sub">Загрузка…</p>
+                  ) : userSongs[u.user_id].length === 0 ? (
+                    <p className="font-serif text-sm italic text-sub">
+                      Пока нет песен
+                    </p>
+                  ) : (
+                    <div className="space-y-1">
+                      {userSongs[u.user_id].map((s) => (
+                        <div
+                          key={s.id}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <span>{s.learned ? "🏆" : "🎵"}</span>
+                          <span className="min-w-0 flex-1 truncate">
+                            <b>{s.title}</b>
+                            {s.artist ? ` — ${s.artist}` : ""}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>

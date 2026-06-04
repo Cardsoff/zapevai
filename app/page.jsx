@@ -23,6 +23,7 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
   const [landing, setLanding] = useState(false);
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
     (async () => {
@@ -40,6 +41,9 @@ export default function HomePage() {
         if (!u && s.length === 0 && !localStorage.getItem("zp_skip_landing")) {
           setLanding(true);
         }
+      } catch {}
+      try {
+        setTheme(localStorage.getItem("zp_theme") || "light");
       } catch {}
       const m = {};
       await Promise.all(
@@ -61,6 +65,17 @@ export default function HomePage() {
   });
 
   const firstDue = due[0];
+
+  function cycleTheme() {
+    const order = ["light", "dark", "black"];
+    const next = order[(order.indexOf(theme) + 1) % order.length];
+    setTheme(next);
+    try {
+      localStorage.setItem("zp_theme", next);
+    } catch {}
+    if (next === "light") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", next);
+  }
 
   if (landing) {
     return (
@@ -84,6 +99,13 @@ export default function HomePage() {
           Песенник{songs ? ` · ${songs.length || "—"} ${plural(songs.length)}` : ""}
         </p>
         <span className="rule flex-1" />
+        <button
+          onClick={cycleTheme}
+          aria-label="Сменить тему"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-card text-sm"
+        >
+          {theme === "light" ? "☀" : theme === "dark" ? "☾" : "●"}
+        </button>
         <Link
           href="/profile"
           aria-label="Профиль"

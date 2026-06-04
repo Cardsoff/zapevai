@@ -125,12 +125,18 @@ export default function SongScreen({ id }) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <button
+              <motion.button
                 onClick={() => pickLevel(lvl.level)}
+                animate={
+                  isSelected
+                    ? { scale: 1.02, backgroundColor: "var(--wine)" }
+                    : { scale: 1 }
+                }
+                transition={{ type: "spring", stiffness: 300, damping: 22 }}
                 className={
-                  "glass flex w-full items-center gap-3 rounded-xl2 p-4 text-left active:scale-[0.98] transition-all " +
+                  "glass flex w-full items-center gap-3 rounded-xl2 p-4 text-left transition-shadow " +
                   (isSelected
-                    ? "ring-2 ring-accent shadow-lg shadow-accent/20"
+                    ? "text-[#fdf6ec] shadow-xl shadow-accent/30"
                     : recommended
                     ? "ring-1 ring-accent/40"
                     : "")
@@ -138,8 +144,12 @@ export default function SongScreen({ id }) {
               >
                 <span
                   className={
-                    "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold " +
-                    (passed ? "bg-good/15 text-good" : "glass")
+                    "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-colors " +
+                    (isSelected
+                      ? "bg-white/20 text-white"
+                      : passed
+                      ? "bg-good/15 text-good"
+                      : "glass")
                   }
                 >
                   {passed ? (
@@ -151,22 +161,26 @@ export default function SongScreen({ id }) {
                   )}
                 </span>
                 <span className="flex-1">
-                  <span className="block font-semibold">
-                    {lvl.name}
-                    {recommended && !isSelected && (
-                      <span className="ml-2 rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
-                        дальше
-                      </span>
-                    )}
+                  <span className="block font-semibold">{lvl.name}</span>
+                  <span
+                    className={
+                      "block text-xs " + (isSelected ? "text-white/70" : "text-sub")
+                    }
+                  >
+                    {lvl.desc}
                   </span>
-                  <span className="block text-xs text-sub">{lvl.desc}</span>
                 </span>
                 {score > 0 && (
-                  <span className="font-serif text-base italic text-accent tabular-nums">
+                  <span
+                    className={
+                      "font-serif text-base italic tabular-nums " +
+                      (isSelected ? "text-white" : "text-accent")
+                    }
+                  >
                     {score}<span className="text-xs">%</span>
                   </span>
                 )}
-              </button>
+              </motion.button>
             </motion.div>
           );
         })}
