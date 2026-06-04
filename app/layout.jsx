@@ -1,4 +1,14 @@
 import "./globals.css";
+import { Playfair_Display, Golos_Text } from "next/font/google";
+
+const display = Playfair_Display({
+  subsets: ["cyrillic", "latin"],
+  variable: "--font-display",
+});
+const body = Golos_Text({
+  subsets: ["cyrillic", "latin"],
+  variable: "--font-body",
+});
 
 export const metadata = {
   title: "Запевай — тренажёр текстов песен",
@@ -12,14 +22,14 @@ export const viewport = {
   maximumScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f5f7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0c0e" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f1e7" },
+    { media: "(prefers-color-scheme: dark)", color: "#171310" },
   ],
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={`${display.variable} ${body.variable}`}>
       <body className="min-h-screen font-sans">
         <div className="aurora" id="aurora">
           <div className="third" />

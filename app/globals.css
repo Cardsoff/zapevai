@@ -3,22 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --ink: #1d1d1f;
-  --sub: #6e6e73;
-  --bg: #f5f5f7;
-  --card: rgba(255, 255, 255, 0.72);
-  --line: rgba(0, 0, 0, 0.08);
-  --glow-opacity: 0.45;
+  --ink: #2a2118;
+  --sub: #8a7d6a;
+  --bg: #f6f1e7;
+  --card: rgba(255, 253, 248, 0.9);
+  --line: rgba(42, 33, 24, 0.12);
+  --wine: #722f37;
+  --gold: #b98a2e;
+  --good: #44702d;
+  --bad: #a32d2d;
+  --glow-opacity: 0.18;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ink: #f5f5f7;
-    --sub: #98989d;
-    --bg: #0c0c0e;
-    --card: rgba(28, 28, 30, 0.72);
-    --line: rgba(255, 255, 255, 0.1);
-    --glow-opacity: 0.3;
+    --ink: #ece4d4;
+    --sub: #a3957f;
+    --bg: #171310;
+    --card: rgba(36, 29, 22, 0.92);
+    --line: rgba(236, 228, 212, 0.12);
+    --wine: #c4707c;
+    --gold: #d4a94e;
+    --good: #8fbf72;
+    --bad: #e07070;
+    --glow-opacity: 0.14;
   }
 }
 
@@ -51,13 +59,13 @@ body {
   transition: opacity 1.2s ease;
 }
 .aurora::before {
-  background: radial-gradient(circle at center, #8b5cf6, transparent 65%);
+  background: radial-gradient(circle at center, #722f37, transparent 65%);
   top: -25vmax;
   left: -20vmax;
   animation: drift1 26s ease-in-out infinite alternate;
 }
 .aurora::after {
-  background: radial-gradient(circle at center, #ec4899, transparent 65%);
+  background: radial-gradient(circle at center, #b98a2e, transparent 65%);
   bottom: -28vmax;
   right: -22vmax;
   animation: drift2 32s ease-in-out infinite alternate;
@@ -69,17 +77,17 @@ body {
   border-radius: 50%;
   filter: blur(100px);
   opacity: calc(var(--glow-opacity) * 0.7);
-  background: radial-gradient(circle at center, #f97316, transparent 65%);
+  background: radial-gradient(circle at center, #722f37, transparent 65%);
   top: 40%;
   left: 55%;
   animation: drift3 38s ease-in-out infinite alternate;
 }
 /* фон «теплеет» при успехах */
 .aurora.warm::before {
-  background: radial-gradient(circle at center, #f59e0b, transparent 65%);
+  background: radial-gradient(circle at center, #d4a94e, transparent 65%);
 }
 .aurora.warm::after {
-  background: radial-gradient(circle at center, #f97316, transparent 65%);
+  background: radial-gradient(circle at center, #b98a2e, transparent 65%);
 }
 
 @keyframes drift1 {
@@ -98,24 +106,25 @@ body {
   }
 }
 
-/* ---- Стеклянные карточки ---- */
+/* ---- Бумажные карточки ---- */
 .glass {
   background: var(--card);
-  backdrop-filter: blur(24px) saturate(1.6);
-  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(42, 33, 24, 0.04);
 }
 
 .text-gradient {
-  background: linear-gradient(120deg, #8b5cf6, #ec4899 55%, #f97316);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--wine);
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
 }
 
 .btn-gradient {
-  background: linear-gradient(120deg, #8b5cf6, #ec4899 60%, #f97316);
-  color: #fff;
+  background: var(--wine);
+  color: #fdf9f0;
 }
 
 /* скрытое слово */
@@ -129,7 +138,7 @@ body {
   transition: background 0.25s ease;
 }
 .blank:active {
-  background: rgba(139, 92, 246, 0.35);
+  background: rgba(114, 47, 55, 0.3);
 }
 
 input,

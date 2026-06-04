@@ -39,7 +39,7 @@ export default function ResultView({ score, songId, onRetry }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
-        className="mt-6 text-3xl font-bold"
+        className="mt-6 font-serif text-4xl font-bold"
       >
         <span className={passed ? "text-gradient" : ""}>{msg.t}</span>
       </motion.h2>

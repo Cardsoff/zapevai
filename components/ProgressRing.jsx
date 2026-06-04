@@ -25,9 +25,8 @@ export default function ProgressRing({
         />
         <defs>
           <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="60%" stopColor="#ec4899" />
-            <stop offset="100%" stopColor="#f97316" />
+            <stop offset="0%" stopColor="var(--wine)" />
+            <stop offset="100%" stopColor="var(--gold)" />
           </linearGradient>
         </defs>
         <motion.circle

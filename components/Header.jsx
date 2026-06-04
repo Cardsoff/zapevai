@@ -16,7 +16,7 @@ export default function Header({ title, back = true, right = null }) {
             ‹
           </button>
         )}
-        <h1 className="flex-1 truncate text-lg font-semibold">{title}</h1>
+        <h1 className="flex-1 truncate font-serif text-xl font-semibold">{title}</h1>
         {right}
       </div>
     </header>
