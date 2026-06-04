@@ -67,6 +67,7 @@ export default function TrainScreen({ id, mode, level }) {
         <ResultView
           score={score}
           songId={id}
+          songTitle={song.title}
           onRetry={() => {
             setScore(null);
             setRound((r) => r + 1);

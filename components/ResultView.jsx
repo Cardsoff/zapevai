@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import ProgressRing from "./ProgressRing";
 import { finishFeedback } from "@/lib/feedback";
+import { getMyReferralCode } from "@/lib/storage";
+import { track } from "@/lib/track";
 
 function message(score) {
   if (score >= 95) return { t: "Идеально!", s: "Ты знаешь это наизусть" };
@@ -14,18 +16,35 @@ function message(score) {
   return { t: "Только начало", s: "Прочитай текст ещё раз и вернись" };
 }
 
-export default function ResultView({ score, songId, onRetry }) {
+export default function ResultView({ score, songId, songTitle, onRetry }) {
   const msg = message(score);
   const passed = score >= 90;
+  const [ref, setRef] = useState(null);
 
   useEffect(() => {
     finishFeedback();
+    getMyReferralCode().then(setRef).catch(() => {});
     const aurora = document.getElementById("aurora");
     if (aurora && passed) {
       aurora.classList.add("warm");
       return () => aurora.classList.remove("warm");
     }
   }, [passed]);
+
+  async function share() {
+    track("result_share", { score });
+    const url = "https://zapevai.vercel.app" + (ref ? `/?ref=${ref}` : "");
+    const text = songTitle
+      ? `Учу «${songTitle}» в «Запевай» — уже ${score}% наизусть!`
+      : `Учу песни наизусть в «Запевай» — ${score}%!`;
+    try {
+      if (navigator.share) await navigator.share({ title: "Запевай", text, url });
+      else {
+        await navigator.clipboard.writeText(text + " " + url);
+        alert("Скопировано — отправь друзьям!");
+      }
+    } catch {}
+  }
 
   return (
     <motion.div
@@ -63,6 +82,12 @@ export default function ResultView({ score, songId, onRetry }) {
           className="w-full rounded-2xl btn-gradient py-3.5 font-semibold active:scale-95 transition-transform"
         >
           Ещё раз
+        </button>
+        <button
+          onClick={share}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl glass py-3.5 font-semibold active:scale-95 transition-transform"
+        >
+          🎤 Поделиться результатом
         </button>
         <Link
           href={`/song/${songId}`}
