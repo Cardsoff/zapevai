@@ -70,7 +70,7 @@ export default function RootLayout({ children }) {
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var t=localStorage.getItem('zp_theme');if(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t&&t!=='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}",
+              "try{var t=localStorage.getItem('zp_theme');if(t&&t!=='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}",
           }}
         />
         <script
