@@ -48,7 +48,7 @@ export default function HomePage() {
         try {
           await migrateGuestData();
         } catch {}
-        applyPendingReferral();
+        await applyPendingReferral();
       }
       const [s, d, st, u] = await Promise.all([
         listMySongs(),

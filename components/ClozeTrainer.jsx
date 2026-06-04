@@ -48,6 +48,10 @@ export default function ClozeTrainer({ songId, lyrics, level, onFinish }) {
 
   function finish() {
     goodFeedback();
+    if (total === 0) {
+      onFinish(100);
+      return;
+    }
     // статистика для адаптивных пропусков (не блокируем переход)
     try {
       saveWordStatsRun(

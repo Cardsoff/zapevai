@@ -36,7 +36,7 @@ export default function SongScreen({ id }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selected, setSelected] = useState(null); // {kind:'cloze',level} | {kind:'letters'} | {kind:'relay'}
   const [learned, setLearnedState] = useState(false);
-  const [plan, setPlan] = useState("pro");
+  const [plan, setPlan] = useState(null);
   const [failed, setFailed] = useState(false);
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
@@ -132,7 +132,10 @@ export default function SongScreen({ id }) {
 
   async function saveLyrics() {
     const res = await updateSongLyrics(id, draft);
-    if (res.error) return;
+    if (res.error) {
+      setEditNote("Не удалось сохранить — проверь связь и попробуй ещё раз.");
+      return;
+    }
     if (res.newId) {
       // создана личная копия — правка ушла редакции
       setEditNote("Сохранено! Это твоя личная версия; правка отправлена редакции для общей базы.");
@@ -284,7 +287,7 @@ export default function SongScreen({ id }) {
             <motion.button
               key={m.kind}
               onClick={() =>
-                plan === "free" ? router.push("/profile") : pick(m.kind)
+                plan !== "pro" ? router.push("/profile") : pick(m.kind)
               }
               animate={
                 active
@@ -303,7 +306,7 @@ export default function SongScreen({ id }) {
                   (active ? "bg-white/20 text-white" : "glass")
                 }
               >
-                {plan === "free" ? "🔒" : m.icon}
+                {plan === "pro" ? m.icon : "🔒"}
               </span>
               <span className="flex-1">
                 <span className="block font-semibold">{m.name}</span>
