@@ -46,6 +46,7 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState(null);
   const [users, setUsers] = useState(null);
+  const [tab, setTab] = useState("users"); // users | upload
 
   useEffect(() => {
     isAdmin().then((ok) => {
@@ -109,6 +110,29 @@ export default function AdminPage() {
     <main className="pb-safe">
       <Header title="Админ" />
 
+      {/* Вкладки */}
+      <div className="mb-5 flex gap-2">
+        {[
+          { id: "users", name: "Пользователи" },
+          { id: "upload", name: "Массовая загрузка" },
+        ].map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={
+              "flex-1 rounded-xl2 border py-2.5 text-sm font-semibold transition-all " +
+              (tab === t.id
+                ? "border-accent bg-accent text-white"
+                : "border-line bg-card")
+            }
+          >
+            {t.name}
+          </button>
+        ))}
+      </div>
+
+      {tab === "users" && (
+      <>
       {/* Пользователи и тарифы */}
       <div className="mb-3 flex items-center gap-3">
         <h2 className="font-serif text-xl font-bold">Пользователи</h2>
@@ -159,10 +183,11 @@ export default function AdminPage() {
         </div>
       )}
 
-      <div className="mb-3 flex items-center gap-3">
-        <h2 className="font-serif text-xl font-bold">Массовая загрузка</h2>
-        <span className="rule flex-1" />
-      </div>
+      </>
+      )}
+
+      {tab === "upload" && (
+      <>
 
       <div className="glass mb-4 rounded-xl2 p-4 text-sm text-sub">
         <p className="mb-2 font-semibold text-ink">Шаблон</p>
@@ -245,6 +270,8 @@ export default function AdminPage() {
             </div>
           ))}
         </div>
+      )}
+      </>
       )}
     </main>
   );

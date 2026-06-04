@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const [sound, setSound] = useState(true);
   const [theme, setTheme] = useState("light");
   const [plan, setPlan] = useState(null);
+  const [showLearned, setShowLearned] = useState(false);
 
   useEffect(() => {
     getStats().then(setStats);
@@ -60,16 +61,21 @@ export default function ProfilePage() {
         ))}
       </div>
 
-      {/* Выучено наизусть */}
-      <div className="mb-3 flex items-center gap-3">
-        <h2 className="font-serif text-xl font-bold">Выучено наизусть</h2>
-        <span className="rule flex-1" />
-      </div>
-      {learned === null ? (
-        <div className="glass mb-6 animate-pulse rounded-xl2 p-6 text-center text-sub">
-          Загрузка…
-        </div>
-      ) : learned.length === 0 ? (
+      {/* Выучено наизусть — сворачиваемый список */}
+      <button
+        onClick={() => setShowLearned(!showLearned)}
+        className="glass mb-3 flex w-full items-center gap-3 rounded-xl2 p-4 active:scale-[0.99] transition-transform"
+      >
+        <span className="font-serif text-lg italic text-accent">🏆</span>
+        <span className="flex-1 text-left font-serif text-lg font-bold">
+          Выучено наизусть
+        </span>
+        <span className="font-serif text-base italic text-accent tabular-nums">
+          {learned === null ? "…" : learned.length}
+        </span>
+        <span className="text-sub">{showLearned ? "▲" : "▼"}</span>
+      </button>
+      {showLearned && learned !== null && (learned.length === 0 ? (
         <div className="glass mb-6 rounded-xl2 p-5 text-center">
           <p className="font-serif text-sm italic text-sub">
             Здесь появятся песни, которые ты отметишь как выученные
@@ -83,7 +89,6 @@ export default function ProfilePage() {
               href={`/song/${s.id}`}
               className="glass spine flex items-center gap-3 rounded-xl2 p-4 pl-5 active:scale-[0.98] transition-transform"
             >
-              <span className="font-serif text-lg italic text-accent">🏆</span>
               <span className="min-w-0 flex-1">
                 <span className="kicker block truncate !text-[10px]">
                   {s.artist || "Без исполнителя"}
@@ -96,7 +101,7 @@ export default function ProfilePage() {
             </Link>
           ))}
         </div>
-      )}
+      ))}
 
       {/* Тариф */}
       {plan && (
