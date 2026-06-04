@@ -10,14 +10,16 @@ import {
   signInWithGoogle,
   signInWithEmail,
   signUpWithEmail,
+  resetPassword,
   supabaseEnabled,
 } from "@/lib/supabase";
 
 export default function AuthPage() {
   const router = useRouter();
-  const [mode, setMode] = useState("signin"); // signin | signup
+  const [mode, setMode] = useState("signin"); // signin | signup | forgot
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
 
@@ -37,10 +39,26 @@ export default function AuthPage() {
     );
   }
 
+  const mismatch = mode === "signup" && password2.length > 0 && password !== password2;
+
   async function submit() {
     if (busy) return;
+    if (mode === "signup" && password !== password2) {
+      setMsg("Пароли не совпадают — проверь оба поля.");
+      return;
+    }
     setBusy(true);
     setMsg(null);
+    if (mode === "forgot") {
+      const { error } = await resetPassword(email.trim());
+      setBusy(false);
+      setMsg(
+        error
+          ? error.message || "Что-то пошло не так"
+          : "Письмо со ссылкой для смены пароля отправлено — проверь почту."
+      );
+      return;
+    }
     const fn = mode === "signin" ? signInWithEmail : signUpWithEmail;
     const { error } = await fn(email.trim(), password);
     setBusy(false);
@@ -58,7 +76,11 @@ export default function AuthPage() {
       <div className="mb-1 flex items-center gap-3">
         <span className="rule flex-1" />
         <p className="kicker">
-          {mode === "signin" ? "Вход в песенник" : "Новый песенник"}
+          {mode === "signin"
+            ? "Вход в песенник"
+            : mode === "signup"
+            ? "Новый песенник"
+            : "Восстановление пароля"}
         </p>
         <span className="rule flex-1" />
       </div>
@@ -111,13 +133,32 @@ export default function AuthPage() {
             placeholder="Электронная почта"
             className="w-full rounded-xl2 border border-line bg-card px-4 py-3.5 text-[16px]"
           />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Пароль (минимум 6 символов)"
-            className="w-full rounded-xl2 border border-line bg-card px-4 py-3.5 text-[16px]"
-          />
+          {mode !== "forgot" && (
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Пароль (минимум 6 символов)"
+              className="w-full rounded-xl2 border border-line bg-card px-4 py-3.5 text-[16px]"
+            />
+          )}
+          {mode === "signup" && (
+            <input
+              type="password"
+              value={password2}
+              onChange={(e) => setPassword2(e.target.value)}
+              placeholder="Повтори пароль"
+              className={
+                "w-full rounded-xl2 border bg-card px-4 py-3.5 text-[16px] " +
+                (mismatch ? "border-bad" : "border-line")
+              }
+            />
+          )}
+          {mismatch && (
+            <p className="px-1 text-xs font-semibold text-bad">
+              Пароли не совпадают
+            </p>
+          )}
         </div>
 
         {msg && (
@@ -128,21 +169,41 @@ export default function AuthPage() {
 
         <button
           onClick={submit}
-          disabled={busy || !email || password.length < 6}
+          disabled={
+            busy ||
+            !email ||
+            (mode !== "forgot" && password.length < 6) ||
+            (mode === "signup" && password !== password2)
+          }
           className="btn-gradient mt-5 w-full rounded-xl2 py-4 font-semibold disabled:opacity-40 active:scale-[0.98] transition-transform"
         >
           {busy
             ? "Секунду…"
             : mode === "signin"
             ? "Войти"
-            : "Создать аккаунт"}
+            : mode === "signup"
+            ? "Создать аккаунт"
+            : "Отправить ссылку"}
         </button>
+
+        {mode === "signin" && (
+          <button
+            onClick={() => {
+              setMode("forgot");
+              setMsg(null);
+            }}
+            className="mt-3 w-full text-center text-sm text-sub"
+          >
+            Забыл пароль?
+          </button>
+        )}
       </motion.div>
 
       <button
         onClick={() => {
           setMode(mode === "signin" ? "signup" : "signin");
           setMsg(null);
+          setPassword2("");
         }}
         className="mt-5 w-full py-2 text-center text-sm text-sub"
       >
