@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Header({ title, back = true, right = null }) {
@@ -33,6 +34,16 @@ export default function Header({ title, back = true, right = null }) {
         )}
         <h1 className="flex-1 truncate font-serif text-xl font-bold">{title}</h1>
         {right}
+        <Link
+          href="/"
+          aria-label="На главную"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-card active:scale-90 transition-transform"
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 10.5 12 3l9 7.5" />
+            <path d="M5 9.5V21h14V9.5" />
+          </svg>
+        </Link>
       </div>
     </header>
   );
