@@ -96,9 +96,7 @@ export default function SongScreen({ id }) {
   for (let l = 1; l <= 5; l++) {
     if ((progress?.cloze?.[l] || 0) >= 90) nextLevel = Math.min(l + 1, 5);
   }
-  const canEdit =
-    Boolean(user && (song.created_by === user.id || ADMIN_EMAILS.includes(user.email))) ||
-    !user; // в гостевом режиме песня своя
+  const canEdit = true; // все: админ/автор — напрямую, остальные получают личную копию
 
   const isSel = (kind, level) =>
     selected && selected.kind === kind && (kind !== "cloze" || selected.level === level);
@@ -130,12 +128,19 @@ export default function SongScreen({ id }) {
     router.push("/");
   }
 
+  const [editNote, setEditNote] = useState(null);
+
   async function saveLyrics() {
     const res = await updateSongLyrics(id, draft);
-    if (!res.error) {
+    if (res.error) return;
+    if (res.newId) {
+      // создана личная копия — правка ушла редакции
+      setEditNote("Сохранено! Это твоя личная версия; правка отправлена редакции для общей базы.");
+      setTimeout(() => router.replace(`/song/${res.newId}`), 1600);
+    } else {
       setSong({ ...song, lyrics: draft.trim() });
-      setEditing(false);
     }
+    setEditing(false);
   }
 
   async function sendReport() {
@@ -381,6 +386,12 @@ export default function SongScreen({ id }) {
             {song.lyrics}
           </motion.pre>
         ))}
+
+      {editNote && (
+        <p className="mt-2 rounded-xl2 bg-good/10 p-3 text-center font-serif text-sm italic text-good">
+          {editNote}
+        </p>
+      )}
 
       {/* В выучено */}
       <button

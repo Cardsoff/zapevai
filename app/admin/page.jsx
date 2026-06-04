@@ -14,6 +14,9 @@ import {
   adminDeleteSong,
   adminReports,
   adminDeleteReport,
+  adminEdits,
+  adminApplyEdit,
+  adminRejectEdit,
 } from "@/lib/storage";
 import { normalizeMeta } from "@/lib/lyrics";
 import Link from "next/link";
@@ -63,6 +66,8 @@ export default function AdminPage() {
   const [allSongs, setAllSongs] = useState(null);
   const [songQuery, setSongQuery] = useState("");
   const [reports, setReports] = useState(null);
+  const [edits, setEdits] = useState(null);
+  const [editMsg, setEditMsg] = useState(null);
   const [period, setPeriod] = useState(null); // дней; null = всё время
   const [stats, setStats] = useState(null);
   const [expanded, setExpanded] = useState(null); // user_id раскрытой карточки
@@ -76,6 +81,7 @@ export default function AdminPage() {
         adminStats(null).then(setStats);
         adminSongs().then(setAllSongs);
         adminReports().then(setReports);
+        adminEdits().then(setEdits);
       }
     });
   }, []);
@@ -107,6 +113,29 @@ export default function AdminPage() {
       return;
     const { error } = await adminDeleteSong(sng.id);
     if (!error) setAllSongs((l) => l.filter((x) => x.id !== sng.id));
+  }
+
+  // простой дифф по строкам
+  function diffLines(oldT, newT) {
+    const o = (oldT || "").split("\n");
+    const n = (newT || "").split("\n");
+    const oset = new Set(o.map((x) => x.trim()));
+    const nset = new Set(n.map((x) => x.trim()));
+    const removed = o.filter((x) => x.trim() && !nset.has(x.trim()));
+    const added = n.filter((x) => x.trim() && !oset.has(x.trim()));
+    return { removed, added };
+  }
+
+  async function applyEdit(e) {
+    const { result } = await adminApplyEdit(e.id, e.new_lyrics);
+    setEditMsg(result === "ok" ? "Принято в общую базу ✓" : result);
+    setEdits((l) => l.filter((x) => x.id !== e.id));
+    setTimeout(() => setEditMsg(null), 3000);
+  }
+
+  async function rejectEdit(e) {
+    await adminRejectEdit(e.id);
+    setEdits((l) => l.filter((x) => x.id !== e.id));
   }
 
   async function resolveReport(id) {
@@ -189,7 +218,7 @@ export default function AdminPage() {
           { id: "stats", name: "Сводка" },
           { id: "users", name: "Люди" },
           { id: "songs", name: "Песни" },
-          { id: "reports", name: "Замечания", badge: (reports || []).length },
+          { id: "reports", name: "Замечания", badge: (reports || []).length + (edits || []).length },
           { id: "upload", name: "Загрузка" },
         ].map((t) => (
           <button
@@ -483,6 +512,69 @@ export default function AdminPage() {
 
       {tab === "reports" && (
         <>
+          {editMsg && (
+            <p className="mb-3 rounded-xl2 bg-good/10 p-3 text-center text-sm font-semibold text-good">
+              {editMsg}
+            </p>
+          )}
+          {edits && edits.length > 0 && (
+            <div className="mb-5 space-y-2">
+              <div className="flex items-center gap-3">
+                <h2 className="font-serif text-xl font-bold">Правки текстов</h2>
+                <span className="rule flex-1" />
+              </div>
+              {edits.map((e) => {
+                const d = diffLines(e.old_lyrics, e.new_lyrics);
+                return (
+                  <div key={e.id} className="glass rounded-xl2 p-4">
+                    <p className="font-serif text-[15px] font-bold">
+                      {e.title}
+                      {e.artist ? (
+                        <span className="font-sans text-xs font-normal text-sub">
+                          {" "}— {e.artist}
+                        </span>
+                      ) : null}
+                    </p>
+                    <p className="mb-2 text-xs text-sub">
+                      {e.email || "аноним"} · {fmtDate(e.created_at)}
+                    </p>
+                    {d.removed.length === 0 && d.added.length === 0 ? (
+                      <p className="text-xs text-sub">
+                        Изменения только в пробелах/регистре
+                      </p>
+                    ) : (
+                      <div className="space-y-0.5 text-[13px] leading-snug">
+                        {d.removed.map((l, i) => (
+                          <p key={"r" + i} className="text-bad line-through">
+                            − {l}
+                          </p>
+                        ))}
+                        {d.added.map((l, i) => (
+                          <p key={"a" + i} className="text-good">
+                            + {l}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        onClick={() => applyEdit(e)}
+                        className="btn-gradient flex-1 rounded-xl py-2 text-xs font-semibold"
+                      >
+                        Принять в общую
+                      </button>
+                      <button
+                        onClick={() => rejectEdit(e)}
+                        className="glass flex-1 rounded-xl py-2 text-xs font-semibold"
+                      >
+                        Отклонить
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           {reports === null ? (
             <div className="glass animate-pulse rounded-xl2 p-5 text-center text-sub">
               Загрузка…
