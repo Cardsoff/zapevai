@@ -155,7 +155,6 @@ body {
 .blank-lg {
   filter: blur(8px);
 }
-}
 .blank:active {
   opacity: 0.65;
 }
