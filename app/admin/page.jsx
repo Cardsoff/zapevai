@@ -212,12 +212,10 @@ export default function AdminPage() {
           </div>
         ) : (
           <>
-            <div className="mb-6 grid grid-cols-2 gap-2">
+            <div className="mb-4 grid grid-cols-2 gap-2">
               {[
                 { v: stats.total_users, l: "всего регистраций", e: "👥" },
                 { v: stats.active_week, l: "активны за неделю", e: "🔥" },
-                { v: stats.today, l: "сегодня", e: "📅" },
-                { v: stats.week, l: "за 7 дней", e: "📈" },
                 { v: stats.pro_users, l: "с тарифом Про", e: "⭐" },
                 { v: stats.total_songs, l: "песен в базе", e: "🎵" },
               ].map((c) => (
@@ -229,6 +227,29 @@ export default function AdminPage() {
                   <p className="text-xs text-sub">{c.l}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Прирост пользователей по периодам */}
+            <div className="glass mb-6 rounded-xl2 p-4">
+              <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sub">
+                📈 Прирост пользователей
+              </p>
+              <div className="grid grid-cols-5 gap-1 text-center">
+                {[
+                  { v: stats.today, l: "день" },
+                  { v: stats.week, l: "неделя" },
+                  { v: stats.month, l: "месяц" },
+                  { v: stats.year, l: "год" },
+                  { v: stats.total_users, l: "всё время" },
+                ].map((c) => (
+                  <div key={c.l}>
+                    <p className="font-serif text-2xl font-bold italic text-accent tabular-nums">
+                      +{c.v}
+                    </p>
+                    <p className="text-[10px] text-sub">{c.l}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="mb-3 flex items-center gap-3">
