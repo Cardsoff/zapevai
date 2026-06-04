@@ -397,7 +397,7 @@ export default function SongScreen({ id }) {
       {user && !reportDone && !reporting && (
         <button
           onClick={() => setReporting(true)}
-          className="mt-3 w-full py-2 text-sm text-sub"
+          className="mt-3 w-full rounded-xl2 bg-bad/10 py-3 text-sm font-semibold text-bad active:scale-[0.98] transition-transform"
         >
           ⚠ Замечание к песне
         </button>
