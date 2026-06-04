@@ -13,7 +13,6 @@ import {
   migrateGuestData,
   searchSongs,
   addToLibrary,
-  listBaseSongs,
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
 import WaveLine, { roman } from "@/components/Decor";
@@ -31,7 +30,6 @@ export default function HomePage() {
   const [baseResults, setBaseResults] = useState(null); // поиск по общей базе
   const [searching, setSearching] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [suggest, setSuggest] = useState([]); // подсказки из базы новичку
 
   async function loadAll() {
     setLoadError(false);
@@ -69,14 +67,6 @@ export default function HomePage() {
       );
       setMastery(m);
 
-      // новичку с пустым (или почти) репертуаром — подсказки из общей базы
-      if (u && s.length < 3) {
-        try {
-          const base = await listBaseSongs(8);
-          const mine = new Set(s.map((x) => x.id));
-          setSuggest(base.filter((x) => !mine.has(x.id)).slice(0, 5));
-        } catch {}
-      }
     } catch (e) {
       setLoadError(true);
       setSongs([]);
@@ -120,7 +110,6 @@ export default function HomePage() {
       fresh = await listMySongs();
     } catch {}
     setSongs(fresh);
-    setSuggest((list) => list.filter((s) => s.id !== id));
     setQuery("");
     setBaseResults(null);
   }
@@ -388,39 +377,6 @@ export default function HomePage() {
               </Link>
             </motion.div>
           ))}
-        </div>
-      )}
-
-      {/* Подсказки новичку из общей базы */}
-      {user && suggest.length > 0 && !query && (
-        <div className="mt-6">
-          <div className="mb-3 flex items-center gap-3">
-            <h2 className="font-serif text-xl font-bold">Из общей базы</h2>
-            <span className="rule flex-1" />
-          </div>
-          <div className="space-y-2">
-            {suggest.map((s) => (
-              <div
-                key={s.id}
-                className="glass flex items-center gap-3 rounded-xl2 p-3 pl-4"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="kicker block truncate !text-[10px]">
-                    {s.artist || "Без исполнителя"}
-                  </span>
-                  <span className="block truncate font-serif text-[15px] font-bold">
-                    {s.title}
-                  </span>
-                </span>
-                <button
-                  onClick={() => addFromBase(s.id)}
-                  className="shrink-0 rounded-xl border border-accent bg-accent px-3 py-1.5 text-xs font-semibold text-white active:scale-95 transition-transform"
-                >
-                  + себе
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
       )}
 

@@ -10,7 +10,13 @@ import {
   adminSetPlan,
   adminStats,
   adminUserSongs,
+  adminSongs,
+  adminDeleteSong,
+  adminReports,
+  adminDeleteReport,
 } from "@/lib/storage";
+import { normalizeMeta } from "@/lib/lyrics";
+import Link from "next/link";
 import { parseLyrics } from "@/lib/lyrics";
 
 const TEMPLATE = `Название песни — Исполнитель
@@ -53,7 +59,10 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState(null);
   const [users, setUsers] = useState(null);
-  const [tab, setTab] = useState("stats"); // stats | users | upload
+  const [tab, setTab] = useState("stats"); // stats | users | songs | reports | upload
+  const [allSongs, setAllSongs] = useState(null);
+  const [songQuery, setSongQuery] = useState("");
+  const [reports, setReports] = useState(null);
   const [stats, setStats] = useState(null);
   const [expanded, setExpanded] = useState(null); // user_id раскрытой карточки
   const [userSongs, setUserSongs] = useState({}); // user_id -> песни
@@ -64,6 +73,8 @@ export default function AdminPage() {
       if (ok) {
         adminListUsers().then(setUsers);
         adminStats().then(setStats);
+        adminSongs().then(setAllSongs);
+        adminReports().then(setReports);
       }
     });
   }, []);
@@ -78,6 +89,22 @@ export default function AdminPage() {
       const songs = await adminUserSongs(u.user_id);
       setUserSongs((m) => ({ ...m, [u.user_id]: songs }));
     }
+  }
+
+  async function deleteSong(sng) {
+    if (
+      !window.confirm(
+        `Удалить «${sng.title}» из базы? Она пропадёт у ${sng.users_count} пользователей вместе с прогрессом.`
+      )
+    )
+      return;
+    const { error } = await adminDeleteSong(sng.id);
+    if (!error) setAllSongs((l) => l.filter((x) => x.id !== sng.id));
+  }
+
+  async function resolveReport(id) {
+    await adminDeleteReport(id);
+    setReports((l) => l.filter((r) => r.id !== id));
   }
 
   function fmtDate(d) {
@@ -150,23 +177,30 @@ export default function AdminPage() {
       <Header title="Админ" />
 
       {/* Вкладки */}
-      <div className="mb-5 flex gap-2">
+      <div className="mb-5 flex flex-wrap gap-1.5">
         {[
-          { id: "stats", name: "Статистика" },
+          { id: "stats", name: "Сводка" },
           { id: "users", name: "Люди" },
+          { id: "songs", name: "Песни" },
+          { id: "reports", name: "Замечания", badge: (reports || []).length },
           { id: "upload", name: "Загрузка" },
         ].map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={
-              "flex-1 rounded-xl2 border py-2.5 text-sm font-semibold transition-all " +
+              "rounded-xl2 border px-3 py-2 text-xs font-semibold transition-all " +
               (tab === t.id
                 ? "border-accent bg-accent text-white"
                 : "border-line bg-card")
             }
           >
             {t.name}
+            {t.badge > 0 && (
+              <span className="ml-1 rounded-full bg-bad px-1.5 text-[10px] text-white">
+                {t.badge}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -336,6 +370,131 @@ export default function AdminPage() {
       )}
 
       </>
+      )}
+
+      {tab === "songs" && (
+        <>
+          <input
+            value={songQuery}
+            onChange={(e) => setSongQuery(e.target.value)}
+            placeholder="Поиск по базе песен"
+            className="glass mb-3 w-full rounded-xl2 px-4 py-3 text-[16px]"
+          />
+          {allSongs === null ? (
+            <div className="glass animate-pulse rounded-xl2 p-5 text-center text-sub">
+              Загрузка…
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {(() => {
+                const counts = {};
+                allSongs.forEach((x) => {
+                  const k = normalizeMeta(x.title);
+                  counts[k] = (counts[k] || 0) + 1;
+                });
+                const q = songQuery.toLowerCase();
+                return allSongs
+                  .filter(
+                    (x) =>
+                      !q ||
+                      x.title.toLowerCase().includes(q) ||
+                      (x.artist || "").toLowerCase().includes(q)
+                  )
+                  .map((x) => (
+                    <div
+                      key={x.id}
+                      className="glass flex items-center gap-3 rounded-xl2 p-3.5 pl-4"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2">
+                          <span className="truncate font-serif text-[15px] font-bold">
+                            {x.title}
+                          </span>
+                          {counts[normalizeMeta(x.title)] > 1 && (
+                            <span className="shrink-0 rounded-full bg-bad/10 px-2 py-0.5 text-[10px] font-semibold text-bad">
+                              дубль?
+                            </span>
+                          )}
+                        </span>
+                        <span className="block truncate text-xs text-sub">
+                          {x.artist || "Без исполнителя"} · у {x.users_count}{" "}
+                          польз. · {fmtDate(x.created_at)}
+                          {x.reports_count > 0 && (
+                            <span className="font-semibold text-bad">
+                              {" "}· ⚠ {x.reports_count}
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                      <Link
+                        href={`/song/${x.id}`}
+                        className="shrink-0 rounded-xl border border-line bg-card px-3 py-1.5 text-xs font-semibold"
+                      >
+                        Открыть
+                      </Link>
+                      <button
+                        onClick={() => deleteSong(x)}
+                        className="shrink-0 rounded-xl bg-bad/10 px-3 py-1.5 text-xs font-semibold text-bad"
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  ));
+              })()}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === "reports" && (
+        <>
+          {reports === null ? (
+            <div className="glass animate-pulse rounded-xl2 p-5 text-center text-sub">
+              Загрузка…
+            </div>
+          ) : reports.length === 0 ? (
+            <div className="glass rounded-xl2 p-6 text-center">
+              <p className="font-serif text-sm italic text-sub">
+                Замечаний нет — тишина и гармония ♪
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {reports.map((r) => (
+                <div key={r.id} className="glass rounded-xl2 p-4">
+                  <p className="font-serif text-[15px] font-bold">
+                    {r.song_title || "(песня удалена)"}
+                    {r.song_artist ? (
+                      <span className="font-sans text-xs font-normal text-sub">
+                        {" "}— {r.song_artist}
+                      </span>
+                    ) : null}
+                  </p>
+                  <p className="mt-1 text-sm">{r.comment}</p>
+                  <p className="mt-1 text-xs text-sub">
+                    {r.email || "аноним"} · {fmtDate(r.created_at)}
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    {r.song_id && (
+                      <Link
+                        href={`/song/${r.song_id}`}
+                        className="flex-1 rounded-xl border border-line bg-card py-2 text-center text-xs font-semibold"
+                      >
+                        Открыть песню
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => resolveReport(r.id)}
+                      className="flex-1 rounded-xl bg-good/10 py-2 text-xs font-semibold text-good"
+                    >
+                      ✓ Решено
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {tab === "upload" && (
