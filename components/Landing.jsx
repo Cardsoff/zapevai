@@ -14,6 +14,7 @@ export default function Landing({ onTry }) {
   const [fog, setFog] = useState({});
   const [gaps, setGaps] = useState({});
   const [mode, setMode] = useState(0);
+  const [autoMode, setAutoMode] = useState(true);
   const rootRef = useRef(null);
   const drag = useRef({ x: 0, y: 0, on: false, moved: false });
   const timers = useRef([]);
@@ -46,6 +47,12 @@ export default function Landing({ onTry }) {
     }
     return () => timers.current.forEach(clearTimeout);
   }, [cur]);
+
+  useEffect(() => {
+    if (cur !== 3 || !autoMode) return;
+    const t = setInterval(() => setMode((m) => (m + 1) % 3), 2200);
+    return () => clearInterval(t);
+  }, [cur, autoMode]);
 
   const go = (i) => setCur(Math.max(0, Math.min(N - 1, i)));
   const next = () => go(cur + 1);
@@ -126,6 +133,9 @@ export default function Landing({ onTry }) {
         ))}
       </div>
 
+      <p className="st-logo">
+        Запе<em>вай</em>
+      </p>
       <button className="skip" onClick={skip}>
         Пропустить
       </button>
@@ -142,9 +152,6 @@ export default function Landing({ onTry }) {
       <div className="slides">
         {/* 1 HERO */}
         <section className={cls(0)} data-i="0">
-          <div className="logo anim d1">
-            Запе<em>вай</em> <span className="nib" />
-          </div>
           <div className="kicker anim d2">Тренажёр памяти для песен</div>
           <h1 className="lead anim d2">
             Выучи{" "}
@@ -252,6 +259,7 @@ export default function Landing({ onTry }) {
                 className={"tab" + (mode === m ? " on" : "")}
                 onClick={(e) => {
                   e.stopPropagation();
+                  setAutoMode(false);
                   setMode(m);
                 }}
               >
