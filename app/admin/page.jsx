@@ -603,6 +603,15 @@ export default function AdminPage() {
                   <p className="mt-1 text-xs text-sub">
                     {r.email || "аноним"} · {fmtDate(r.created_at)}
                   </p>
+                  {r.screenshot_url && (
+                    <a href={r.screenshot_url} target="_blank" rel="noreferrer">
+                      <img
+                        src={r.screenshot_url}
+                        alt="скриншот"
+                        className="mt-2 max-h-40 rounded-xl border border-line"
+                      />
+                    </a>
+                  )}
                   <div className="mt-2 flex gap-2">
                     {r.song_id && (
                       <Link

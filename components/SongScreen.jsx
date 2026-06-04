@@ -44,6 +44,7 @@ export default function SongScreen({ id }) {
   const [reporting, setReporting] = useState(false);
   const [reportText, setReportText] = useState("");
   const [reportDone, setReportDone] = useState(false);
+  const [reportFile, setReportFile] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -145,11 +146,12 @@ export default function SongScreen({ id }) {
 
   async function sendReport() {
     if (reportText.trim().length < 3) return;
-    const res = await reportSong(id, reportText);
+    const res = await reportSong(id, reportText, reportFile);
     if (!res.error) {
       setReportDone(true);
       setReporting(false);
       setReportText("");
+      setReportFile(null);
     }
   }
 
@@ -425,6 +427,18 @@ export default function SongScreen({ id }) {
             placeholder="Например: ошибка во втором куплете…"
             className="w-full resize-none rounded-xl2 border border-line bg-card px-3 py-2.5 text-[15px]"
           />
+          <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-xl2 border border-dashed border-line px-3 py-2.5 text-sm text-sub">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setReportFile(e.target.files?.[0] || null)}
+              className="hidden"
+            />
+            📎{" "}
+            {reportFile
+              ? `${reportFile.name.slice(0, 28)} ✓`
+              : "Приложить скриншот (по желанию)"}
+          </label>
           <div className="mt-2 flex gap-2">
             <button
               onClick={sendReport}

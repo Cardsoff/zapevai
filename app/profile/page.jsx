@@ -43,6 +43,7 @@ export default function ProfilePage() {
   const [ideaOpen, setIdeaOpen] = useState(false);
   const [ideaText, setIdeaText] = useState("");
   const [ideaMsg, setIdeaMsg] = useState(null);
+  const [ideaFile, setIdeaFile] = useState(null);
   const [refCode, setRefCode] = useState(null);
 
   useEffect(() => {
@@ -403,13 +404,26 @@ export default function ProfilePage() {
                 placeholder="Чего не хватает? Что сделать удобнее?"
                 className="w-full resize-none rounded-xl2 border border-line bg-card px-3 py-2.5 text-[15px]"
               />
+              <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-xl2 border border-dashed border-line px-3 py-2.5 text-sm text-sub">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setIdeaFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+                📎{" "}
+                {ideaFile
+                  ? `${ideaFile.name.slice(0, 28)} ✓`
+                  : "Приложить скриншот (по желанию)"}
+              </label>
               <button
                 onClick={async () => {
                   if (ideaText.trim().length < 3) return;
-                  const r = await sendSuggestion(ideaText);
+                  const r = await sendSuggestion(ideaText, ideaFile);
                   if (!r.error) {
                     setIdeaMsg("Спасибо! Предложение у редакции ✓");
                     setIdeaText("");
+                    setIdeaFile(null);
                     setIdeaOpen(false);
                     setTimeout(() => setIdeaMsg(null), 3000);
                   }
