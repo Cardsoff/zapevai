@@ -5,18 +5,20 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import { getStats } from "@/lib/storage";
+import { getStats, listLearnedSongs } from "@/lib/storage";
 import { getUser, signOut, supabaseEnabled } from "@/lib/supabase";
 import { toggleSound, soundEnabled } from "@/lib/feedback";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [stats, setStats] = useState({ streak: 0, totalSongs: 0, mastered: 0 });
+  const [stats, setStats] = useState({ streak: 0, best: 0, totalSongs: 0, mastered: 0 });
+  const [learned, setLearned] = useState(null);
   const [user, setUser] = useState(null);
   const [sound, setSound] = useState(true);
 
   useEffect(() => {
     getStats().then(setStats);
+    listLearnedSongs().then(setLearned);
     getUser().then(setUser);
     setSound(soundEnabled());
   }, []);
@@ -40,10 +42,49 @@ export default function ProfilePage() {
         ))}
       </div>
 
+      {/* Выучено наизусть */}
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="font-serif text-xl font-bold">Выучено наизусть</h2>
+        <span className="rule flex-1" />
+      </div>
+      {learned === null ? (
+        <div className="glass mb-6 animate-pulse rounded-xl2 p-6 text-center text-sub">
+          Загрузка…
+        </div>
+      ) : learned.length === 0 ? (
+        <div className="glass mb-6 rounded-xl2 p-5 text-center">
+          <p className="font-serif text-sm italic text-sub">
+            Здесь появятся песни, которые ты отметишь как выученные
+          </p>
+        </div>
+      ) : (
+        <div className="mb-6 space-y-2">
+          {learned.map((s) => (
+            <Link
+              key={s.id}
+              href={`/song/${s.id}`}
+              className="glass spine flex items-center gap-3 rounded-xl2 p-4 pl-5 active:scale-[0.98] transition-transform"
+            >
+              <span className="font-serif text-lg italic text-accent">🏆</span>
+              <span className="min-w-0 flex-1">
+                <span className="kicker block truncate !text-[10px]">
+                  {s.artist || "Без исполнителя"}
+                </span>
+                <span className="block truncate font-serif text-[16px] font-bold">
+                  {s.title}
+                </span>
+              </span>
+              <span className="text-sub">›</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Настройки */}
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-sub">
-        Настройки
-      </h2>
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="font-serif text-xl font-bold">Настройки</h2>
+        <span className="rule flex-1" />
+      </div>
       <button
         onClick={() => setSound(toggleSound())}
         className="glass mb-6 flex w-full items-center justify-between rounded-xl2 p-4 active:scale-[0.99] transition-transform"
@@ -65,9 +106,10 @@ export default function ProfilePage() {
       </button>
 
       {/* Аккаунт */}
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-sub">
-        Аккаунт
-      </h2>
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="font-serif text-xl font-bold">Аккаунт</h2>
+        <span className="rule flex-1" />
+      </div>
       {user ? (
         <div className="glass rounded-xl2 p-4">
           <p className="mb-1 font-semibold">{user.email}</p>
