@@ -8,6 +8,7 @@ import LettersTrainer from "@/components/LettersTrainer";
 import RelayTrainer from "@/components/RelayTrainer";
 import ResultView from "@/components/ResultView";
 import { getSong, saveResult } from "@/lib/storage";
+import { track } from "@/lib/track";
 import { CLOZE_LEVELS } from "@/lib/lyrics";
 
 const MODE_NAMES = {
@@ -27,12 +28,14 @@ export default function TrainScreen({ id, mode, level }) {
       .then((s) => {
         setSong(s);
         if (!s) setFailed(true);
+        else track("train_start", { mode, level });
       })
       .catch(() => setFailed(true));
   }, [id]);
 
   async function finish(s) {
     setScore(s);
+    track("train_finish", { mode, level, score: s });
     try {
       await saveResult(id, mode, level, s);
     } catch {}

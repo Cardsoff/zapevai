@@ -23,6 +23,7 @@ import {
   changeEmail,
 } from "@/lib/supabase";
 import { toggleSound, soundEnabled } from "@/lib/feedback";
+import { track } from "@/lib/track";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -453,6 +454,7 @@ export default function ProfilePage() {
               (refCode ? `/?ref=${refCode}` : ""),
           };
           try {
+            track("invite_share");
             if (navigator.share) await navigator.share(data);
             else {
               await navigator.clipboard.writeText(data.text + " " + data.url);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import WaveLine from "@/components/Decor";
+import { track } from "@/lib/track";
 import {
   signInWithGoogle,
   signInWithEmail,
@@ -81,6 +82,7 @@ export default function AuthPage() {
     if (error) {
       setMsg(ruError(error.message));
     } else if (mode === "signup") {
+      track("signup", { method: "email" });
       setMsg("Готово! Проверь почту и подтверди адрес.");
     } else {
       router.push("/");
@@ -111,7 +113,7 @@ export default function AuthPage() {
         className="glass rounded-xl3 p-5"
       >
         <button
-          onClick={() => signInWithGoogle()}
+          onClick={() => { track("login_click", { method: "google" }); signInWithGoogle(); }}
           className="mb-4 flex w-full items-center justify-center gap-2.5 rounded-xl2 border border-line bg-card py-3.5 font-semibold active:scale-[0.98] transition-transform"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">

@@ -9,6 +9,7 @@ import {
   adminListUsers,
   adminSetPlan,
   adminStats,
+  adminEvents,
   adminUserSongs,
   adminSongs,
   adminDeleteSong,
@@ -69,6 +70,7 @@ export default function AdminPage() {
   const [edits, setEdits] = useState(null);
   const [editMsg, setEditMsg] = useState(null);
   const [period, setPeriod] = useState(null); // дней; null = всё время
+  const [events, setEvents] = useState(null);
   const [stats, setStats] = useState(null);
   const [expanded, setExpanded] = useState(null); // user_id раскрытой карточки
   const [userSongs, setUserSongs] = useState({}); // user_id -> песни
@@ -79,6 +81,7 @@ export default function AdminPage() {
       if (ok) {
         adminListUsers().then(setUsers);
         adminStats(null).then(setStats);
+        adminEvents(7).then(setEvents);
         adminSongs().then(setAllSongs);
         adminReports().then(setReports);
         adminEdits().then(setEdits);
@@ -97,6 +100,17 @@ export default function AdminPage() {
       setUserSongs((m) => ({ ...m, [u.user_id]: songs }));
     }
   }
+
+  const EVENT_RU = {
+    signup: "Регистрации",
+    login: "Входы",
+    login_click: "Клик «Google»",
+    song_added: "Добавлено песен",
+    train_start: "Начато тренировок",
+    train_finish: "Завершено тренировок",
+    invite_share: "Поделились",
+    result_share: "Поделились результатом",
+  };
 
   async function changePeriod(days) {
     setPeriod(days);
@@ -331,6 +345,32 @@ export default function AdminPage() {
                 </div>
               )}
             </div>
+
+            {/* Воронка событий за 7 дней */}
+            {events && events.length > 0 && (
+              <>
+                <div className="mb-3 mt-6 flex items-center gap-3">
+                  <h2 className="font-serif text-xl font-bold">События · 7 дней</h2>
+                  <span className="rule flex-1" />
+                </div>
+                <div className="glass rounded-xl2 p-2">
+                  {events.map((e) => (
+                    <div
+                      key={e.name}
+                      className="flex items-center justify-between px-3 py-2 text-sm"
+                    >
+                      <span>{EVENT_RU[e.name] || e.name}</span>
+                      <span className="font-serif italic text-accent tabular-nums">
+                        {e.n}
+                        <span className="ml-1 text-xs not-italic text-sub">
+                          ({e.users} чел.)
+                        </span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
         </>

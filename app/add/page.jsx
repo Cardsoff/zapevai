@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import { addSong, addToLibrary, searchSongs } from "@/lib/storage";
+import { track } from "@/lib/track";
 import { getUser } from "@/lib/supabase";
 import { parseLyrics } from "@/lib/lyrics";
 
@@ -62,6 +63,7 @@ export default function AddSongPage() {
       setNotice({ type: "name", match: res.nameMatch });
       return;
     }
+    track("song_added", { duplicate: Boolean(res.duplicate) });
     if (res.duplicate) {
       setNotice({
         type: "dup",
