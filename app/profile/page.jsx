@@ -81,8 +81,8 @@ export default function ProfilePage() {
       {/* Статистика */}
       <div className="mb-6 grid grid-cols-3 gap-2">
         {[
-          { v: stats.streak, l: "дней подряд", e: "🔥" },
-          { v: stats.totalSongs, l: "песен", e: "🎵" },
+          { v: stats.streak, l: dayWord(stats.streak) + " подряд", e: "🔥" },
+          { v: stats.totalSongs, l: songWord(stats.totalSongs), e: "🎵" },
           { v: stats.mastered, l: "наизусть", e: "🏆" },
         ].map((s) => (
           <div key={s.l} className="glass rounded-xl2 p-4 text-center">
@@ -478,3 +478,21 @@ export default function ProfilePage() {
     </main>
   );
 }
+
+
+function songWord(n) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "песня";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "песни";
+  return "песен";
+}
+
+function dayWord(n) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "день";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "дня";
+  return "дней";
+}
+
