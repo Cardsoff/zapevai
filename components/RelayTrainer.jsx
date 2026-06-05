@@ -80,9 +80,15 @@ export default function RelayTrainer({ lyrics, onFinish }) {
         ) : (
           <button
             onClick={reveal}
-            className="mt-4 w-full rounded-2xl border-2 border-dashed border-line py-5 text-sub active:scale-[0.98] transition-transform"
+            className="mt-4 block w-full rounded-2xl py-2 text-left active:scale-[0.98] transition-transform"
+            aria-label="Скрытая строка — вспомни её, затем коснись"
           >
-            Вспомни следующую строку, затем коснись
+            <span
+              className="fog-tail font-serif text-[17px] leading-relaxed"
+              aria-hidden="true"
+            >
+              {lines[current].text}
+            </span>
           </button>
         )}
       </div>
