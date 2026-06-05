@@ -433,3 +433,13 @@ a:focus-visible {
   .stories .slide { padding: 84px 26px 64px; }
   .stories .sub { font-size: 14px; margin-top: 12px; }
 }
+
+/* Туман для «Первых букв» и «Эстафеты» — в пару к .blank из «Пропусков» */
+.fog-tail {
+  display: inline-block;
+  color: color-mix(in srgb, var(--ink) 62%, var(--bg));
+  filter: blur(5px);
+  opacity: 0.55;
+  user-select: none;
+  -webkit-user-select: none;
+}
