@@ -335,7 +335,7 @@ export default function Landing({ onTry }) {
               </div>
             ))}
           </div>
-          <div className="ring anim d3">
+          <div className="st-ring anim d3">
             <svg width="108" height="108" viewBox="0 0 108 108">
               <circle className="bg" cx="54" cy="54" r="46" />
               <circle className="fg" cx="54" cy="54" r="46" />

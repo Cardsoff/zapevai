@@ -366,15 +366,15 @@ a:focus-visible {
 .stories .slide.active .tl-pt .dot { animation: st-dotin .5s var(--st-ease) forwards; }
 .stories .tl-pt .d { font-size: 11px; font-weight: 600; color: var(--st-muted); margin-top: 8px; }
 @keyframes st-dotin { to { opacity: 1; transform: scale(1); } }
-.stories .ring { margin: 14px auto 0; width: 108px; height: 108px; position: relative; }
-.stories .ring svg { transform: rotate(-90deg); }
-.stories .ring .bg { fill: none; stroke: var(--st-paper2); stroke-width: 9; }
-.stories .ring .fg { fill: none; stroke: var(--st-wine); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 289; stroke-dashoffset: 289; }
-.stories .slide.active .ring .fg { animation: st-ringfill 1.4s var(--st-ease) .5s forwards; }
+.stories .st-ring { margin: 14px auto 0; width: 108px; height: 108px; position: relative; }
+.stories .st-ring svg { transform: rotate(-90deg); }
+.stories .st-ring .bg { fill: none; stroke: var(--st-paper2); stroke-width: 9; }
+.stories .st-ring .fg { fill: none; stroke: var(--st-wine); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 289; stroke-dashoffset: 289; }
+.stories .slide.active .st-ring .fg { animation: st-ringfill 1.4s var(--st-ease) .5s forwards; }
 @keyframes st-ringfill { to { stroke-dashoffset: 72; } }
-.stories .ring .label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.stories .ring .label b { font-family: var(--font-display); font-size: 30px; color: var(--st-wine); }
-.stories .ring .label span { font-size: 10px; color: var(--st-muted); letter-spacing: .1em; text-transform: uppercase; }
+.stories .st-ring .label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.stories .st-ring .label b { font-family: var(--font-display); font-size: 30px; color: var(--st-wine); }
+.stories .st-ring .label span { font-size: 10px; color: var(--st-muted); letter-spacing: .1em; text-transform: uppercase; }
 .stories .flame { display: inline-block; animation: st-flick 1.4s var(--st-ease) infinite; }
 @keyframes st-flick { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-2px) rotate(2deg)} }
 .stories .pills { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
