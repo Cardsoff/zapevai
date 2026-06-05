@@ -18,6 +18,8 @@ import {
 // Перевод типовых ошибок Supabase
 function ruError(msg) {
   const m = (msg || "").toLowerCase();
+  if (m.includes("timeout"))
+    return "Сервер не отвечает — проверь связь и попробуй ещё раз.";
   if (m.includes("invalid login credentials")) return "Неверная почта или пароль";
   if (m.includes("email not confirmed")) return "Почта не подтверждена — найди письмо от «Запевай»";
   if (m.includes("already registered")) return "Такой аккаунт уже есть — попробуй войти";
@@ -56,6 +58,15 @@ export default function AuthPage() {
 
   const mismatch = mode === "signup" && password2.length > 0 && password !== password2;
 
+  function withTimeout(p, ms = 12000) {
+    return Promise.race([
+      p,
+      new Promise((resolve) =>
+        setTimeout(() => resolve({ error: { message: "timeout" } }), ms)
+      ),
+    ]);
+  }
+
   async function submit() {
     if (busy) return;
     if (mode === "signup" && password !== password2) {
@@ -64,28 +75,35 @@ export default function AuthPage() {
     }
     setBusy(true);
     setMsg(null);
-    if (mode === "forgot") {
-      const { error } = await resetPassword(email.trim());
-      setBusy(false);
-      setMsg(
-        error
-          ? ruError(error.message)
-          : "Письмо со ссылкой для смены пароля отправлено — проверь почту."
+    try {
+      if (mode === "forgot") {
+        const { error } = await withTimeout(resetPassword(email.trim()));
+        setMsg(
+          error
+            ? ruError(error.message)
+            : "Письмо со ссылкой для смены пароля отправлено — проверь почту."
+        );
+        return;
+      }
+      const { error } = await withTimeout(
+        mode === "signin"
+          ? signInWithEmail(email.trim(), password)
+          : signUpWithEmail(email.trim(), password, name)
       );
-      return;
-    }
-    const { error } =
-      mode === "signin"
-        ? await signInWithEmail(email.trim(), password)
-        : await signUpWithEmail(email.trim(), password, name);
-    setBusy(false);
-    if (error) {
-      setMsg(ruError(error.message));
-    } else if (mode === "signup") {
-      track("signup", { method: "email" });
-      setMsg("Готово! Проверь почту и подтверди адрес.");
-    } else {
-      router.push("/");
+      if (error) {
+        setMsg(ruError(error.message));
+      } else if (mode === "signup") {
+        track("signup", { method: "email" });
+        setMsg("Готово! Проверь почту и подтверди адрес.");
+      } else {
+        router.push("/");
+      }
+    } catch {
+      setMsg(
+        "Не получилось связаться с сервером — проверь интернет и попробуй ещё раз."
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
