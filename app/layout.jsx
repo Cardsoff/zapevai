@@ -74,6 +74,12 @@ export default function RootLayout({ children }) {
           }}
         />
         <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){function r(){try{if(sessionStorage.getItem('zp_cr'))return;sessionStorage.setItem('zp_cr','1');}catch(e){}location.reload();}window.addEventListener('error',function(e){var t=e&&e.target,s=(t&&(t.src||t.href))||'',m=(e&&e.message)||'';if((s&&String(s).indexOf('/_next/')>-1)||m.indexOf('ChunkLoadError')>-1||m.indexOf('Loading chunk')>-1)r();},true);window.addEventListener('unhandledrejection',function(e){var m=String((e&&e.reason&&(e.reason.message||e.reason))||'');if(m.indexOf('ChunkLoadError')>-1||m.indexOf('Loading chunk')>-1||m.indexOf('dynamically imported module')>-1||m.indexOf('Importing a module script failed')>-1)r();});window.addEventListener('load',function(){setTimeout(function(){try{sessionStorage.removeItem('zp_cr')}catch(e){}},8000)});})();",
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
