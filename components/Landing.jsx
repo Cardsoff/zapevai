@@ -431,7 +431,7 @@ export default function Landing({ onTry }) {
             <br />
             от первой
             <br />
-            до последней
+            до последней буквы
           </h2>
           <p className="sub anim d2">
             Заведи свой песенник за минуту. Без карт, без воды.
