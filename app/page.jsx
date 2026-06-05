@@ -208,7 +208,7 @@ export default function HomePage() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-semibold">
-            {stats.streak > 0 ? "дней подряд ты поёшь" : "начни серию сегодня"}
+            {stats.streak > 0 ? dayWord(stats.streak) + " подряд ты поёшь" : "начни серию сегодня"}
           </p>
           {stats.best > 1 && (
             <p className="mt-0.5 text-xs text-sub">
@@ -461,6 +461,14 @@ export default function HomePage() {
       </div>
     </main>
   );
+}
+
+function dayWord(n) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "день";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "дня";
+  return "дней";
 }
 
 function plural(n) {
