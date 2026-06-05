@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import {
   isAdmin,
   adminBulkAddSongs,
+  adminCheckBulk,
   adminListUsers,
   adminSetPlan,
   adminStats,
@@ -62,6 +63,8 @@ export default function AdminPage() {
   const [raw, setRaw] = useState("");
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState(null);
+  const [checked, setChecked] = useState(null);
+  const [decisions, setDecisions] = useState({});
   const [users, setUsers] = useState(null);
   const [tab, setTab] = useState("stats"); // stats | users | songs | reports | upload
   const [allSongs, setAllSongs] = useState(null);
@@ -213,13 +216,50 @@ export default function AdminPage() {
   const parsed = parseBatch(raw);
   const valid = parsed.filter((p) => p.valid);
 
+  async function doUpload(items) {
+    setBusy(true);
+    const res = await adminBulkAddSongs(items);
+    setResults(res);
+    setChecked(null);
+    setDecisions({});
+    setBusy(false);
+  }
+
   async function upload() {
     if (busy || valid.length === 0) return;
     setBusy(true);
     setResults(null);
-    const res = await adminBulkAddSongs(valid);
-    setResults(res);
+    setChecked(null);
+    const chk = await adminCheckBulk(valid);
     setBusy(false);
+    if (!chk) return;
+    if (chk.some((c) => c.check === "name")) {
+      const d = {};
+      chk.forEach((c, i) => {
+        if (c.check === "name") d[i] = "update";
+      });
+      setDecisions(d);
+      setChecked(chk);
+      return;
+    }
+    await doUpload(
+      chk.map((c) => ({ ...c, action: c.check === "exact" ? "skip" : "new" }))
+    );
+  }
+
+  async function confirmUpload() {
+    if (busy || !checked) return;
+    await doUpload(
+      checked.map((c, i) => ({
+        ...c,
+        action:
+          c.check === "exact"
+            ? "skip"
+            : c.check === "name"
+            ? decisions[i] || "update"
+            : "new",
+      }))
+    );
   }
 
   return (
@@ -737,6 +777,50 @@ export default function AdminPage() {
           : `Загрузить в базу${valid.length ? ` (${valid.length})` : ""}`}
       </button>
 
+      {checked && (
+        <div className="mt-4 space-y-2">
+          <p className="text-sm font-semibold">
+            Совпадения по названию — выбери, что сделать с каждой:
+          </p>
+          {checked.map((c, i) =>
+            c.check !== "name" ? null : (
+              <div key={i} className="glass rounded-xl2 px-4 py-3 text-sm">
+                <p className="mb-2 font-semibold">
+                  {c.title} — {c.artist || "без исполнителя"}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    ["update", "Обновить текст"],
+                    ["new", "Загрузить новой"],
+                    ["skip", "Пропустить"],
+                  ].map(([v, l]) => (
+                    <button
+                      key={v}
+                      onClick={() => setDecisions((d) => ({ ...d, [i]: v }))}
+                      className={
+                        "rounded-full border px-3 py-1.5 text-xs font-semibold transition-all " +
+                        ((decisions[i] || "update") === v
+                          ? "border-accent bg-accentDeep text-white"
+                          : "border-line bg-card")
+                      }
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          )}
+          <button
+            onClick={confirmUpload}
+            disabled={busy}
+            className="w-full rounded-2xl btn-gradient py-3 text-sm font-semibold disabled:opacity-40 active:scale-[0.98] transition-transform"
+          >
+            {busy ? "Загружаю…" : "Применить и загрузить"}
+          </button>
+        </div>
+      )}
+
       {/* Отчёт */}
       {results && (
         <div className="mt-4 space-y-1.5">
@@ -746,12 +830,14 @@ export default function AdminPage() {
               className="glass flex items-center gap-3 rounded-xl2 px-4 py-2.5 text-sm"
             >
               <span>
-                {r.status === "added" ? "✅" : r.status === "duplicate" ? "📋" : "⚠️"}
+                {r.status === "added" ? "✅" : r.status === "updated" ? "🔄" : r.status === "duplicate" ? "📋" : "⚠️"}
               </span>
               <span className="min-w-0 flex-1 truncate font-semibold">{r.title}</span>
               <span className="shrink-0 text-xs text-sub">
                 {r.status === "added"
                   ? "добавлена"
+                  : r.status === "updated"
+                  ? "текст обновлён"
                   : r.status === "duplicate"
                   ? "уже в базе"
                   : r.detail}
