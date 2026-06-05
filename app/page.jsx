@@ -15,6 +15,7 @@ import {
   addToLibrary,
   applyPendingReferral,
   listBaseSongs,
+  countBaseSongs,
 } from "@/lib/storage";
 import { getUser } from "@/lib/supabase";
 import WaveLine, { roman } from "@/components/Decor";
@@ -28,6 +29,7 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
   const [landing, setLanding] = useState(false);
+  const [baseCount, setBaseCount] = useState(null);
   const [theme, setTheme] = useState("light");
   const [baseResults, setBaseResults] = useState(null); // поиск по общей базе
   const [searching, setSearching] = useState(false);
@@ -75,6 +77,9 @@ export default function HomePage() {
         })
       );
       setMastery(m);
+      countBaseSongs()
+        .then((n) => n != null && setBaseCount(n))
+        .catch(() => {});
 
       if (s.length < 3) {
         try {
@@ -402,6 +407,11 @@ export default function HomePage() {
           <div className="mb-3 flex items-center gap-3">
             <h2 className="font-serif text-xl font-bold">Попробуй из общей базы</h2>
             <span className="rule flex-1" />
+            {baseCount > 0 && (
+              <span className="shrink-0 text-xs italic text-sub">
+                {baseCount} {plural(baseCount)}
+              </span>
+            )}
           </div>
           <div className="space-y-2">
             {suggest.map((s) => (
