@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { tapFeedback } from "@/lib/feedback";
 import { track } from "@/lib/track";
+import { countBaseSongs } from "@/lib/storage";
 
 const N = 8;
 
@@ -15,12 +16,16 @@ export default function Landing({ onTry }) {
   const [gaps, setGaps] = useState({});
   const [mode, setMode] = useState(0);
   const [autoMode, setAutoMode] = useState(true);
+  const [baseCount, setBaseCount] = useState(null);
   const rootRef = useRef(null);
   const drag = useRef({ x: 0, y: 0, on: false, moved: false });
   const timers = useRef([]);
 
   useEffect(() => {
     track("landing_view");
+    countBaseSongs()
+      .then((n) => n != null && setBaseCount(n))
+      .catch(() => {});
   }, []);
 
   // перезапуск входных анимаций активного слайда + авто-открытие слайда 2
@@ -377,7 +382,7 @@ export default function Landing({ onTry }) {
               ["✓", "Без зубрёжки", "d2"],
               ["↻", "Без регистрации", "d2"],
               ["▢", "На любом устройстве", "d3"],
-              ["♪", "Общая база песен", "d3"],
+              ["♪", baseCount > 0 ? `В базе уже ${baseCount} ${songWord(baseCount)}` : "Общая база песен", "d3"],
               ["⤓", "Ставится на телефон", "d4"],
               ["◐", "3 темы оформления", "d4"],
             ].map(([ic, t, d]) => (
@@ -464,4 +469,12 @@ export default function Landing({ onTry }) {
       </div>
     </div>
   );
+}
+
+function songWord(n) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "песня";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "песни";
+  return "песен";
 }
