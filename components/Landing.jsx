@@ -192,6 +192,16 @@ export default function Landing({ onTry }) {
           <svg className="hero-wave anim d4" viewBox="0 0 240 42">
             <path d="M2,21 Q22,2 42,21 T82,21 T122,21 T162,21 T202,21 T238,21" />
           </svg>
+          <button
+            className="stbtn btn-wine hero-cta anim d5"
+            onClick={(e) => {
+              e.stopPropagation();
+              track("landing_cta", { which: "guest_hero" });
+              skip();
+            }}
+          >
+            Попробовать сейчас
+          </button>
           <div className="hint">
             <span>листай →</span>
           </div>

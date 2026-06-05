@@ -391,6 +391,7 @@ a:focus-visible {
 .stories .stbtn:active { transform: scale(.97); }
 .stories .btn-wine { background: var(--wine-deep); color: #f6f1e7; }
 .stories .btn-glass { background: color-mix(in srgb, var(--st-paper) 50%, transparent); color: var(--st-wine); border: 1.5px solid var(--st-wine); }
+.stories .hero-cta { width: auto; align-self: flex-start; margin-top: 26px; padding: 14px 30px; font-size: 14.5px; }
 .stories .terms { margin-top: 18px; text-align: center; font-size: 11px; color: var(--st-muted); line-height: 1.5; }
 .stories .terms a { text-decoration: underline; }
 .stories .final-mark { font-family: var(--font-display); font-size: 46px; color: var(--st-gold); line-height: 1; margin-bottom: 8px; }
