@@ -316,14 +316,14 @@ export default function AdminPage() {
                   Пока нет данных за две недели
                 </p>
               ) : (
-                <div className="flex items-end gap-1.5" style={{ height: 120 }}>
+                <div className="flex items-end justify-center gap-1.5" style={{ height: 120 }}>
                   {stats.by_day.map((d) => {
                     const max = Math.max(...stats.by_day.map((x) => x.n));
                     const h = max > 0 ? Math.round((d.n / max) * 96) + 8 : 8;
                     return (
                       <div
                         key={d.day}
-                        className="flex flex-1 flex-col items-center gap-1"
+                        className="flex w-full max-w-[56px] flex-1 flex-col items-center gap-1"
                       >
                         <span className="text-[10px] font-semibold tabular-nums text-sub">
                           {d.n}
